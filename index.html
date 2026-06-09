@@ -699,12 +699,13 @@ function renderTracks(){
       const isActive=!isDone&&!isLocked;
       const nc=isDone?'done':isActive?'active':'';
       const rc=isDone?'completed':isLocked?'locked':'';
-      const clickAttr=isActive?'onclick="openSessionModal(\''+track.id+'\',\''+s.id+'\')"':'';
+      const canOpen=isActive||isDone;
+      const clickAttr=canOpen?'onclick="openSessionModal(\''+track.id+'\',\''+s.id+'\')"':'';
       sh+='<div class="track-session-row '+rc+'" '+clickAttr+'>'+
             '<div class="track-session-num '+nc+'">'+(isDone?'✓':i+1)+'</div>'+
             '<div class="track-session-info">'+
               '<div class="track-session-name">'+s.name+'</div>'+
-              '<div class="track-session-meta">'+(isLocked?'🔒 Complete previous session first':s.desc)+'</div>'+
+              '<div class="track-session-meta">'+(isLocked?'🔒 Complete previous session first':isDone?'✓ Completed · tap to train again':s.desc)+'</div>'+
             '</div>'+
             '<div class="track-session-xp">+'+s.xpBonus+' XP</div>'+
           '</div>';
@@ -805,16 +806,39 @@ function loadNextSessionDrill(){
   document.getElementById('sTimerDisplay').textContent=d.workTime>0?fmtTime(d.workTime):'●●●';
   document.getElementById('sTimerDisplay').className='timer-display';
   document.getElementById('sPhaseLabel').textContent=d.reps
-    ? d.reps+' reps × '+d.sets+' sets · tap ▶ Start Set when ready'
+    ? d.reps+' reps × '+d.sets+' sets · tap ✓ after each set'
     : d.workTime+'s work · '+d.restTime+'s rest · '+d.sets+' sets';
 
+  const isReps=!(d.workTime>0);
   document.getElementById('sBtnStart').style.display='inline-block';
+  document.getElementById('sBtnStart').textContent=isReps?'✓ Set 1 Done':'▶ Start Set';
   document.getElementById('sBtnPause').style.display='none';
   document.getElementById('sBtnPause').textContent='⏸ Pause';
 }
 
 function sessionStartSet(){
   ST.paused=false;
+  const d=ST.drill;
+  if(!d) return;
+
+  // Rep-based drills have no countdown — each click marks the current set done.
+  if(!(d.workTime>0)){
+    dotMark('sSetsRow',ST.set,'done');
+    ST.set++;
+    if(ST.set>ST.totalSets){
+      const justDone=ST.drill;
+      ST.drill=null;
+      recordDrillDone(justDone);
+      sessionDrillIndex++;
+      loadNextSessionDrill();
+      return;
+    }
+    document.getElementById('sBtnStart').textContent='✓ Set '+ST.set+' Done';
+    document.getElementById('sPhaseLabel').textContent='Set '+ST.set+'/'+ST.totalSets+' · '+d.reps+' reps — tap ✓ when done';
+    return;
+  }
+
+  // Timed drills run the countdown.
   document.getElementById('sBtnStart').style.display='none';
   document.getElementById('sBtnPause').style.display='inline-block';
   document.getElementById('sBtnPause').textContent='⏸ Pause';
@@ -907,18 +931,26 @@ function sessionNextDrill(){
 function completeSession(){
   clearInterval(ST.interval); ST.interval=null;
   const s=currentSession;
-  awardXP(s.xpBonus);
-  state.sessionsDone++;
+  const firstTime=!(state.sessionProgress[s.id]&&state.sessionProgress[s.id].completed);
   state.minutesTrained+=s.totalTime;
   if(!state.sessionProgress[s.id]) state.sessionProgress[s.id]={};
   state.sessionProgress[s.id].completed=true;
   markTodayDone();
-  state.activityLog.push('🏆 '+s.name+' · +'+s.xpBonus+' XP · '+new Date().toLocaleDateString());
+  // The one-time session bonus + session count only apply the first time.
+  if(firstTime){
+    awardXP(s.xpBonus);
+    state.sessionsDone++;
+    state.activityLog.push('🏆 '+s.name+' · +'+s.xpBonus+' XP · '+new Date().toLocaleDateString());
+  } else {
+    state.activityLog.push('🔁 '+s.name+' (replay) · '+new Date().toLocaleDateString());
+  }
   save();
   document.getElementById('sRunner').style.display='none';
   document.getElementById('sComplete').style.display='block';
   document.getElementById('sProgressBar').style.width='100%';
-  document.getElementById('sCompleteMsg').textContent='+'+s.xpBonus+' bonus XP earned! Total sessions: '+state.sessionsDone;
+  document.getElementById('sCompleteMsg').textContent=firstTime
+    ? '+'+s.xpBonus+' bonus XP earned! Total sessions: '+state.sessionsDone
+    : 'Nice replay! Drill XP added. Total sessions: '+state.sessionsDone;
 }
 
 function renderProgress(){
