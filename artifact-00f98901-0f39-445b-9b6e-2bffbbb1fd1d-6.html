@@ -1,0 +1,1021 @@
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<style>
+								body {
+									background-color: white; /* Ensure the iframe has a white background */
+								}
+
+								
+							</style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TouchLab – Soccer Skills Trainer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0e1a; --card: #131929; --accent: #00c97a; --accent2: #1a73e8;
+      --warn: #f5a623; --danger: #e84040; --text: #e8eaf0; --muted: #7a8099;
+      --border: #1f2840; --radius: 14px;
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+    header { background: var(--card); border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .logo { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; }
+    .logo span { color: var(--accent); }
+    .xp-pill { background: var(--border); border-radius: 999px; padding: 5px 14px; font-size: 0.82rem; font-weight: 600; color: var(--warn); display: flex; align-items: center; gap: 6px; }
+    nav { display: flex; background: var(--card); border-bottom: 1px solid var(--border); overflow-x: auto; }
+    nav button { flex: 1; min-width: 80px; padding: 12px 8px; background: none; border: none; color: var(--muted); font-size: 0.8rem; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; }
+    nav button.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .page { display: none; padding: 20px; max-width: 700px; margin: 0 auto; }
+    .page.active { display: block; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; }
+    .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+    .card-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 12px; }
+    .drill-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; cursor: pointer; transition: border-color 0.2s, transform 0.15s; }
+    .drill-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .drill-card.locked { opacity: 0.45; cursor: not-allowed; }
+    .drill-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+    .drill-name { font-size: 0.95rem; font-weight: 700; }
+    .drill-badges { display: flex; gap: 5px; flex-wrap: wrap; }
+    .badge { font-size: 0.68rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .badge-intermediate { background: #1a3a5c; color: #60b4ff; }
+    .badge-advanced { background: #3a1a1a; color: #ff7070; }
+    .badge-elite { background: #2a1a3a; color: #c07aff; }
+    .badge-touch { background: #0d2e20; color: var(--accent); }
+    .badge-dribble { background: #2d2200; color: var(--warn); }
+    .badge-pass { background: #1a1f3a; color: #6699ff; }
+    .badge-cone { background: #1f1a0d; color: #d4a820; }
+    .badge-combo { background: #2a0d2a; color: #e060e0; }
+    .drill-desc { font-size: 0.82rem; color: var(--muted); margin-bottom: 8px; line-height: 1.45; }
+    .drill-meta { display: flex; gap: 12px; font-size: 0.76rem; color: var(--muted); flex-wrap: wrap; }
+    .progress-bar-wrap { background: var(--border); border-radius: 999px; height: 4px; margin-top: 8px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; border-radius: 999px; background: var(--accent); transition: width 0.5s ease; }
+    .section-label { font-size: 0.73rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin: 18px 0 8px; }
+    .btn { display: inline-block; padding: 11px 22px; border-radius: 999px; font-size: 0.85rem; font-weight: 700; border: none; cursor: pointer; transition: opacity 0.15s, transform 0.1s; }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-secondary { background: var(--border); color: var(--text); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-warn { background: var(--warn); color: #000; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; justify-content: center; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; display: none; align-items: center; justify-content: center; padding: 16px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 540px; max-height: 92vh; overflow-y: auto; padding: 22px; position: relative; }
+    .modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; color: var(--muted); font-size: 1.4rem; cursor: pointer; line-height: 1; z-index: 10; }
+    .modal-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 4px; padding-right: 28px; }
+    .modal-sub { font-size: 0.83rem; color: var(--muted); margin-bottom: 14px; }
+    .timer-display { text-align: center; font-size: 3.8rem; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -2px; color: var(--accent); margin: 12px 0; }
+    .timer-display.warning { color: var(--warn); }
+    .timer-display.done { color: var(--danger); }
+    .phase-banner { text-align: center; font-size: 0.83rem; color: var(--muted); margin-bottom: 8px; min-height: 18px; line-height: 1.4; }
+    .steps { list-style: none; counter-reset: step; }
+    .steps li { counter-increment: step; display: flex; gap: 10px; margin-bottom: 10px; font-size: 0.85rem; color: var(--text); line-height: 1.5; }
+    .steps li::before { content: counter(step); min-width: 22px; height: 22px; background: var(--accent); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.72rem; flex-shrink: 0; }
+    .sets-row { display: flex; gap: 7px; flex-wrap: wrap; margin: 10px 0; justify-content: center; }
+    .set-dot { width: 26px; height: 26px; border-radius: 50%; background: var(--border); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 700; transition: all 0.2s; color: var(--muted); }
+    .set-dot.done { background: var(--accent); border-color: var(--accent); color: #000; }
+    .set-dot.active { border-color: var(--accent); color: var(--accent); background: var(--border); }
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 11px; margin-bottom: 16px; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; text-align: center; }
+    .stat-number { font-size: 1.9rem; font-weight: 800; color: var(--accent); }
+    .stat-label { font-size: 0.76rem; color: var(--muted); margin-top: 2px; }
+    .streak-row { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+    .streak-day { width: 30px; height: 30px; border-radius: 6px; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.63rem; font-weight: 700; color: var(--muted); }
+    .streak-day.done { background: var(--accent); color: #000; }
+    .streak-day.today { border: 2px solid var(--accent); }
+    .prog-item { display: flex; align-items: center; gap: 11px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .prog-item:last-child { border-bottom: none; }
+    .prog-icon { width: 34px; height: 34px; border-radius: 8px; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .prog-info { flex: 1; min-width: 0; }
+    .prog-name { font-size: 0.88rem; font-weight: 600; }
+    .prog-detail { font-size: 0.73rem; color: var(--muted); }
+    .prog-xp { font-size: 0.8rem; font-weight: 700; color: var(--warn); white-space: nowrap; }
+    .level-badge { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #1a3a1a, #0d2a0d); border: 1px solid var(--accent); border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; width: 100%; }
+    .level-icon { font-size: 1.7rem; }
+    .level-info .level-title { font-size: 0.97rem; font-weight: 800; color: var(--accent); }
+    .level-info .level-sub { font-size: 0.76rem; color: var(--muted); }
+    .cone-diagram { background: #0c1a10; border: 1px solid #1a3a20; border-radius: 10px; padding: 12px; margin: 12px 0; font-size: 0.8rem; color: #60c080; font-family: monospace; white-space: pre; line-height: 1.6; overflow-x: auto; }
+    .track-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; }
+    .track-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .track-title { font-size: 1.05rem; font-weight: 800; }
+    .track-progress-label { font-size: 0.78rem; color: var(--muted); }
+    .track-sessions { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .track-session-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; background: var(--bg); border: 1px solid var(--border); cursor: pointer; transition: border-color 0.2s; }
+    .track-session-row:hover:not(.locked) { border-color: var(--accent); }
+    .track-session-row.locked { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+    .track-session-row.completed { border-color: #1a4a2a; background: #0a1f10; }
+    .track-session-num { width: 28px; height: 28px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; flex-shrink: 0; color: var(--muted); }
+    .track-session-num.done { background: var(--accent); color: #000; }
+    .track-session-num.active { background: var(--accent2); color: #fff; }
+    .track-session-info { flex: 1; }
+    .track-session-name { font-size: 0.88rem; font-weight: 700; }
+    .track-session-meta { font-size: 0.74rem; color: var(--muted); margin-top: 2px; }
+    .track-session-xp { font-size: 0.78rem; font-weight: 700; color: var(--warn); white-space: nowrap; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+    .highlight { color: var(--accent); font-weight: 700; }
+    .filter-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
+    .filter-btn { padding: 5px 13px; border-radius: 999px; border: 1px solid var(--border); background: none; color: var(--muted); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #000; }
+    .search-input { width: 100%; padding: 10px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 999px; color: var(--text); font-size: 0.88rem; margin-bottom: 14px; outline: none; }
+    .search-input:focus { border-color: var(--accent); }
+    .session-drill-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+    .session-drill-card.current { border-color: var(--accent); background: #0a1f14; }
+    .session-drill-card.done-card { opacity: 0.5; }
+    .sdcard-num { width: 24px; height: 24px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 800; flex-shrink: 0; color: var(--muted); }
+    .sdcard-num.current { background: var(--accent); color: #000; }
+    .sdcard-num.done { background: #1a4a2a; color: var(--accent); }
+    @media (max-width: 400px) { .timer-display { font-size: 3rem; } }
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">Touch<span>Lab</span> ⚽</div>
+  <div class="xp-pill">⚡ <span id="headerXP">0</span> XP</div>
+</header>
+<nav>
+  <button class="active" onclick="showPage('home')">🏠 Home</button>
+  <button onclick="showPage('drills')">⚽ Drills</button>
+  <button onclick="showPage('tracks')">🔥 Sessions</button>
+  <button onclick="showPage('progress')">📈 Progress</button>
+</nav>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div style="margin-bottom:16px;">
+    <div style="font-size:1.45rem;font-weight:800;margin-bottom:3px;">Good session, Baller 👋</div>
+    <div style="font-size:0.86rem;color:var(--muted);">Small space. Elite touch.</div>
+  </div>
+  <div class="level-badge">
+    <div class="level-icon">🎯</div>
+    <div class="level-info">
+      <div class="level-title" id="levelTitle">Level 1 – Ball Striker</div>
+      <div class="level-sub" id="levelSubtitle">0 / 200 XP to next level</div>
+    </div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div class="card-title">Overall XP</div>
+      <div style="font-size:0.8rem;color:var(--muted);" id="xpLabel">0 XP</div>
+    </div>
+    <div class="progress-bar-wrap" style="height:7px;">
+      <div class="progress-bar-fill" id="xpBar" style="width:0%"></div>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-number" id="statDrills">0</div><div class="stat-label">Drills Done</div></div>
+    <div class="stat-card"><div class="stat-number" id="statSessions">0</div><div class="stat-label">Sessions</div></div>
+    <div class="stat-card"><div class="stat-number" id="statStreak">0</div><div class="stat-label">Day Streak 🔥</div></div>
+    <div class="stat-card"><div class="stat-number" id="statMins">0</div><div class="stat-label">Mins Trained</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🗓️ Weekly Streak</div>
+    <div class="card-sub">Days you trained this week</div>
+    <div class="streak-row" id="streakRow"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">⚡ Quick Start</div>
+    <div class="card-sub">Jump into a recommended drill based on your level</div>
+    <button class="btn btn-primary" onclick="quickStart()">Start Recommended Drill</button>
+  </div>
+</div>
+
+<!-- DRILLS -->
+<div id="page-drills" class="page">
+  <div style="font-size:1.25rem;font-weight:800;margin-bottom:4px;">Drill Library</div>
+  <div style="font-size:0.82rem;color:var(--muted);margin-bottom:14px;"><span id="drillCount">0</span> drills · Tap to begin</div>
+  <input class="search-input" id="drillSearch" placeholder="🔍 Search drills..." oninput="renderDrills()">
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn" onclick="setFilter('touch',this)">🦶 Touch</button>
+    <button class="filter-btn" onclick="setFilter('dribble',this)">⚡ Dribble</button>
+    <button class="filter-btn" onclick="setFilter('cone',this)">🏁 Cone</button>
+    <button class="filter-btn" onclick="setFilter('combo',this)">💥 Combo</button>
+    <button class="filter-btn" onclick="setFilter('intermediate',this)">Int</button>
+    <button class="filter-btn" onclick="setFilter('advanced',this)">Adv</button>
+    <button class="filter-btn" onclick="setFilter('elite',this)">Elite</button>
+  </div>
+  <div id="drill-list"></div>
+</div>
+
+<!-- TRACKS -->
+<div id="page-tracks" class="page">
+  <div style="font-size:1.25rem;font-weight:800;margin-bottom:4px;">Session Tracks</div>
+  <div style="font-size:0.82rem;color:var(--muted);margin-bottom:18px;">Complete sessions in order to unlock the next.</div>
+  <div id="track-list"></div>
+</div>
+
+<!-- PROGRESS -->
+<div id="page-progress" class="page">
+  <div style="font-size:1.25rem;font-weight:800;margin-bottom:4px;">Your Progress</div>
+  <div style="font-size:0.82rem;color:var(--muted);margin-bottom:16px;">Mastery across every drill.</div>
+  <div class="card">
+    <div class="card-title">🏆 Drill Mastery</div>
+    <div class="card-sub">Completions &amp; XP per drill</div>
+    <div id="masteryList"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📋 Recent Activity</div>
+    <div id="activityLog" style="font-size:0.82rem;color:var(--muted);">No activity yet.</div>
+  </div>
+</div>
+
+<!-- DRILL MODAL -->
+<div class="modal-overlay" id="drillModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeDrillModal()">✕</button>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-sub" id="modalSub"></div>
+    <div id="modalBadges" class="drill-badges" style="margin-bottom:12px;"></div>
+    <div id="modalDiagram"></div>
+    <div id="modalSteps"></div>
+    <hr class="divider">
+    <div style="display:flex;gap:14px;margin-bottom:8px;font-size:0.83rem;">
+      <div><span class="highlight" id="modalSets">3</span> sets</div>
+      <div><span class="highlight" id="modalRest">30s</span> rest</div>
+      <div><span class="highlight" id="modalXP">25</span> XP</div>
+    </div>
+    <div id="coachTip" style="background:#0a1f14;border-left:3px solid var(--accent);padding:9px 13px;border-radius:0 8px 8px 0;font-size:0.8rem;color:#80d8a0;margin-bottom:14px;"></div>
+    <div id="drillRunner" style="display:none;">
+      <div class="sets-row" id="setsRow"></div>
+      <div class="timer-display" id="timerDisplay">00:00</div>
+      <div class="phase-banner" id="phaseLabel"></div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="btnPause" onclick="pauseTimer()">⏸ Pause</button>
+        <button class="btn btn-danger" onclick="skipSet()">⏭ Skip Set</button>
+      </div>
+    </div>
+    <div id="drillStart">
+      <div class="btn-row" style="justify-content:flex-start;">
+        <button class="btn btn-primary" onclick="startDrill()">▶ Start Drill</button>
+        <button class="btn btn-secondary" onclick="closeDrillModal()">Cancel</button>
+      </div>
+    </div>
+    <div id="drillComplete" style="display:none;text-align:center;padding:10px 0;">
+      <div style="font-size:2rem;margin-bottom:6px;">🎉</div>
+      <div style="font-size:1.15rem;font-weight:800;margin-bottom:4px;">Drill Complete!</div>
+      <div style="font-size:0.88rem;color:var(--muted);margin-bottom:12px;" id="completeMsg"></div>
+      <button class="btn btn-primary" onclick="closeDrillModal()">✓ Finish &amp; Claim XP</button>
+    </div>
+  </div>
+</div>
+
+<!-- SESSION MODAL -->
+<div class="modal-overlay" id="sessionModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeSessionModal()">✕</button>
+    <div class="modal-title" id="sModalTitle"></div>
+    <div class="modal-sub" id="sModalSub"></div>
+    <div id="sPreStart">
+      <div id="sModalDrillList" style="margin:12px 0;"></div>
+      <div class="btn-row" style="justify-content:flex-start;">
+        <button class="btn btn-primary" onclick="startSession()">▶ Begin Session</button>
+        <button class="btn btn-secondary" onclick="closeSessionModal()">Cancel</button>
+      </div>
+    </div>
+    <div id="sRunner" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <div style="font-size:0.78rem;color:var(--muted);" id="sStepLabel">Drill 1 of 6</div>
+        <div style="font-size:0.78rem;color:var(--muted);" id="sStepXP"></div>
+      </div>
+      <div class="progress-bar-wrap" style="height:5px;margin-bottom:14px;">
+        <div class="progress-bar-fill" id="sProgressBar" style="width:0%"></div>
+      </div>
+      <div style="font-size:1rem;font-weight:700;margin-bottom:2px;" id="sDrillName"></div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-bottom:12px;line-height:1.45;" id="sDrillTip"></div>
+      <div class="sets-row" id="sSetsRow"></div>
+      <div class="timer-display" id="sTimerDisplay">00:00</div>
+      <div class="phase-banner" id="sPhaseLabel">Tap Start Set to begin</div>
+      <div class="btn-row">
+        <button class="btn btn-primary"   id="sBtnStart" onclick="sessionStartSet()">▶ Start Set</button>
+        <button class="btn btn-secondary" id="sBtnPause" onclick="sessionPause()" style="display:none;">⏸ Pause</button>
+        <button class="btn btn-warn"      id="sBtnNext"  onclick="sessionNextDrill()">⏭ Next Drill</button>
+      </div>
+    </div>
+    <div id="sComplete" style="display:none;text-align:center;padding:10px 0;">
+      <div style="font-size:2.4rem;margin-bottom:6px;">🏆</div>
+      <div style="font-size:1.15rem;font-weight:800;margin-bottom:4px;">Session Complete!</div>
+      <div style="font-size:0.88rem;color:var(--muted);margin-bottom:14px;" id="sCompleteMsg"></div>
+      <button class="btn btn-primary" onclick="closeSessionModal()">✓ Claim XP &amp; Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DRILLS = [
+  {id:'t01',category:'touch',name:'Inside-Outside Roll Series',icon:'🦶',level:'intermediate',tags:['touch'],sets:4,workTime:45,restTime:30,reps:null,xp:30,unlockXP:0,coachTip:'Keep weight over the ball. Touch every half-second or faster.',desc:'Alternate inside and outside foot rolls with tight controlled touches.',steps:['Place ball at feet in comfortable stance.','Use inside of right foot to roll ball left.','Immediately use outside of left foot to roll right.','Build rhythm — aim for a touch every 0.5 seconds.','Stay on toes, knees slightly bent.'],diagram:null},
+  {id:'t02',category:'touch',name:'Sole Roll Figure-8',icon:'∞',level:'intermediate',tags:['touch'],sets:4,workTime:40,restTime:25,reps:null,xp:25,unlockXP:0,coachTip:'Start slow to nail the shape, then push tempo.',desc:'Roll ball in a figure-8 around both feet using only the sole.',steps:['Feet shoulder-width apart.','Place sole of right foot on top of ball.','Roll ball inward across to left foot.','Left sole takes over, continues figure-8.','Increase speed until touches are rapid-fire.'],diagram:null},
+  {id:'t03',category:'touch',name:'Juggle-to-Trap Combos',icon:'🎯',level:'intermediate',tags:['touch'],sets:5,workTime:0,restTime:20,reps:10,xp:35,unlockXP:0,coachTip:'The kill touch is everything — a perfect trap under pressure wins games.',desc:'Juggle a set number then kill the ball dead with one touch.',steps:['Juggle 5 times using feet only.','On 5th touch, cushion ball dead to ground.','Ball must stop within 30cm of feet.','Repeat — count successful traps only.','Progression: increase to 8, 10, 15 juggles.'],diagram:null},
+  {id:'t04',category:'touch',name:'Wall Rebound 1-Touch Series',icon:'🧱',level:'advanced',tags:['touch','pass'],sets:5,workTime:60,restTime:30,reps:null,xp:45,unlockXP:80,coachTip:'Vary first touch direction every rep — inside, outside, across body.',desc:'Fire ball at wall and take first touch in a chosen direction before it bounces twice.',steps:['Stand 3–4m from wall.','Pass ball firmly into wall.','As it rebounds, take a single touch in pre-chosen direction.','Set 1: touch right. Set 2: left. Set 3: across body.','Sets 4–5: choose direction randomly.'],diagram:null},
+  {id:'t05',category:'touch',name:'Chest-to-Foot Control',icon:'💪',level:'intermediate',tags:['touch'],sets:4,workTime:0,restTime:25,reps:12,xp:30,unlockXP:0,coachTip:'Cushion with your chest, lean back slightly, guide ball down to dominant foot.',desc:'Throw ball up, cushion with chest, bring under control at feet.',steps:['Toss ball upward to chest height.','Arch back slightly to cushion on contact.','Ball should drop softly in front of feet.','Control with instep before it bounces twice.','Switch: bring ball to left foot on odd reps.'],diagram:null},
+  {id:'t06',category:'touch',name:'Thigh Juggle Series',icon:'🦵',level:'intermediate',tags:['touch'],sets:4,workTime:50,restTime:25,reps:null,xp:28,unlockXP:0,coachTip:'Thigh touches should be soft — imagine the ball landing on a pillow.',desc:'Juggle exclusively on the thighs, alternating legs.',steps:['Drop to dominant thigh.','Alternate thighs each touch.','Keep thigh at 90° to absorb and redirect upward.','Aim for 20+ consecutive.','Add a foot touch every 5th thigh touch.'],diagram:null},
+  {id:'t07',category:'touch',name:'Outside Foot Trap Drill',icon:'👟',level:'intermediate',tags:['touch'],sets:4,workTime:0,restTime:20,reps:12,xp:32,unlockXP:20,coachTip:'The outside foot trap is the most underused weapon. Own it.',desc:'Receive ball exclusively with outside of foot, cushioning to ground.',steps:['Toss ball to waist-thigh height.','Extend leg slightly outward.','Contact ball with outside of foot.','Angle foot down to guide ball to ground.','Alternate feet each rep.'],diagram:null},
+  {id:'t08',category:'touch',name:'Weak Foot Only Juggle',icon:'🦶',level:'intermediate',tags:['touch'],sets:5,workTime:40,restTime:30,reps:null,xp:35,unlockXP:0,coachTip:'Your weak foot only improves through deliberate solo practice.',desc:'Juggle using only your weak foot for the entire set.',steps:['Drop ball onto weak foot.','Keep juggling — weak foot only.','If ball drops, restart immediately.','Goal: 10 consecutive touches per set.','Progression: 15, 20, 25 consecutive.'],diagram:null},
+  {id:'t09',category:'touch',name:'Head-Chest-Thigh-Foot Combo',icon:'🔢',level:'advanced',tags:['touch'],sets:3,workTime:0,restTime:35,reps:8,xp:50,unlockXP:100,coachTip:'Each body part absorbs differently. Think softness at every contact.',desc:'Full body juggle sequence: header, chest, thigh, foot.',steps:['Toss ball above head height.','Head it forward and upward.','Chest cushion as it falls.','Thigh bounce.','Catch on instep.','Count rep only if all 4 contacts are clean.'],diagram:null},
+  {id:'t10',category:'touch',name:'Rolling Ball First Touch',icon:'🎱',level:'intermediate',tags:['touch'],sets:4,workTime:0,restTime:20,reps:14,xp:28,unlockXP:0,coachTip:'This simulates a rolling pass. The angle of your first touch is everything.',desc:'Roll ball along ground, let it travel 2m, then kill it dead with one touch.',steps:['Place ball 3m in front of you.','Give it a firm push so it rolls toward you.','Cushion to a dead stop.','Inside foot reps 1–5, outside reps 6–10, sole reps 11–14.'],diagram:null},
+  {id:'t11',category:'touch',name:'Backfoot Drag Trap',icon:'↩️',level:'advanced',tags:['touch'],sets:4,workTime:0,restTime:25,reps:10,xp:40,unlockXP:80,coachTip:'The back-foot drag protects ball while setting up your next move.',desc:'Receive rolling ball with sole and drag backward behind standing foot.',steps:['Roll ball toward you from 2m.','Place sole on top as it arrives.','Drag it backward and behind standing foot.','Body naturally shields the ball.','Turn 90° to simulate escaping pressure.','Alternate drag foot each rep.'],diagram:null},
+  {id:'t12',category:'touch',name:'Aerial Ball Kill — All Surfaces',icon:'🎪',level:'advanced',tags:['touch'],sets:4,workTime:0,restTime:30,reps:10,xp:45,unlockXP:120,coachTip:'A truly elite player kills any ball from any angle on any surface.',desc:'Throw ball to various heights and kill it dead with whichever surface arrives first.',steps:['Throw ball to varying heights and directions.','Decide surface on instinct.','Ball must die within 30cm.','No pre-planning which surface to use.'],diagram:null},
+  {id:'t13',category:'touch',name:'Two-Touch Wall Combo',icon:'🏓',level:'intermediate',tags:['touch','pass'],sets:5,workTime:50,restTime:30,reps:null,xp:38,unlockXP:50,coachTip:'Touch 1 sets the angle. Touch 2 is the pass. Never rush touch 1.',desc:'Pass to wall, take directional first touch, pass again.',steps:['Stand 2.5m from wall.','Pass firmly to wall.','First touch: move ball 45° left or right.','Second touch: pass back to wall.','Alternate direction every 5 reps.'],diagram:null},
+  {id:'t14',category:'touch',name:'Lofted Ball Chest Control',icon:'🌤️',level:'intermediate',tags:['touch'],sets:4,workTime:0,restTime:25,reps:12,xp:30,unlockXP:30,coachTip:'Open your chest like a satellite dish.',desc:'Throw ball high, control with chest to a stationary position at feet.',steps:['Throw ball 3–4m above head.','Step into the dropping ball.','Open chest, slight lean back.','Cushion ball downward.','Follow with instep to kill completely.'],diagram:null},
+  {id:'t15',category:'touch',name:'Sole Trap Speed Drill',icon:'⚡',level:'intermediate',tags:['touch'],sets:5,workTime:40,restTime:20,reps:null,xp:28,unlockXP:0,coachTip:"React — don't predict. This trains your touch response time.",desc:'Roll ball back and forth rapidly with one foot sole, trapping dead on command.',steps:['Ball at feet.','Roll ball 1m forward with sole.','Sprint to catch up.','Trap dead with same foot.','On every 4th roll: trap immediately.'],diagram:null},
+  {id:'t16',category:'touch',name:'Inside Foot Precision Trap',icon:'🎯',level:'intermediate',tags:['touch'],sets:4,workTime:0,restTime:20,reps:14,xp:28,unlockXP:0,coachTip:"Point your inside foot like a gate — redirecting the ball's energy.",desc:'Receive firm rolled passes and kill them with inside of foot to a precise spot.',steps:['Roll ball firmly toward yourself from 3m.','Set a target spot 30cm to your side.','Trap ball and guide it to the exact target.','Alternate target side each rep.'],diagram:null},
+  {id:'t17',category:'touch',name:'High Ball Volley Kill',icon:'🎆',level:'advanced',tags:['touch'],sets:4,workTime:0,restTime:30,reps:10,xp:48,unlockXP:100,coachTip:'The instep angle determines everything. Tilt foot down to kill.',desc:'Throw ball high, volley it downward to kill on first contact.',steps:['Throw ball 4m high.','Position under dropping ball.','Strike downward with instep.','Ball must stick to ground within 1m.','Progression: volley to a target cone.'],diagram:null},
+  {id:'t18',category:'touch',name:'Spin Trap Series',icon:'🌀',level:'advanced',tags:['touch'],sets:4,workTime:0,restTime:30,reps:10,xp:45,unlockXP:100,coachTip:'Spin before the ball arrives, not after.',desc:'Receive ball, execute a 180° spin while trapping, emerge with ball under control.',steps:['Roll or bounce ball toward yourself.','Begin spin 0.5 seconds before contact.','Trap ball mid-spin with inside foot.','Complete rotation facing new direction.','Alternate spin direction each rep.'],diagram:null},
+  {id:'t19',category:'touch',name:'No-Look Trap Drill',icon:'🙈',level:'advanced',tags:['touch'],sets:3,workTime:0,restTime:35,reps:8,xp:52,unlockXP:150,coachTip:'Force peripheral vision and muscle memory to take over.',desc:'Receive wall rebound without directly looking at your feet.',steps:['Position 2m from wall.','Pass ball to wall.','As it rebounds: look up, away from feet.','Trap with inside foot using only peripheral vision.'],diagram:null},
+  {id:'t20',category:'touch',name:'Receiving Under Pressure',icon:'🔥',level:'advanced',tags:['touch'],sets:4,workTime:50,restTime:35,reps:null,xp:55,unlockXP:180,coachTip:'Every touch must protect the ball. Body between defender and ball always.',desc:'Receive ball from wall, immediately shield and protect before playing back.',steps:['Stand 2m from wall.','Pass to wall.','As ball returns, step into it and shield.','Hold shield position for 2 seconds.','Play back to wall.'],diagram:null},
+  {id:'t21',category:'touch',name:'Directional First Touch Grid',icon:'🧭',level:'intermediate',tags:['touch'],sets:4,workTime:0,restTime:25,reps:12,xp:35,unlockXP:50,coachTip:'Name your direction before the ball arrives.',desc:'Receive ball and take first touch in a pre-called direction.',steps:['Mark a small cross on ground.','Stand at center.','Roll ball to yourself.','Call direction out loud BEFORE touching ball.','Take touch in called direction.'],diagram:null},
+  {id:'t22',category:'touch',name:'Bounce Juggle Rhythm',icon:'🎵',level:'intermediate',tags:['touch'],sets:4,workTime:45,restTime:25,reps:null,xp:26,unlockXP:0,coachTip:'The ground bounce helps reset your rhythm.',desc:'Juggle twice, let ball bounce once, juggle twice, repeat.',steps:['Juggle twice with feet.','Let ball bounce once off ground.','Juggle twice again.','Maintain rhythm without breaking.'],diagram:null},
+  {id:'t23',category:'touch',name:'Weak Foot Wall Pass & Trap',icon:'🦶',level:'intermediate',tags:['touch','pass'],sets:5,workTime:50,restTime:30,reps:null,xp:38,unlockXP:40,coachTip:"Your weak foot is just your strong foot that hasn't trained enough yet.",desc:'All touches exclusively with weak foot. Pass to wall and receive continuously.',steps:['Stand 2.5m from wall.','Pass to wall with weak foot only.','Receive with weak foot only.','No dominant foot contact allowed.'],diagram:null},
+  {id:'t24',category:'touch',name:'Ball Mastery Pyramid',icon:'🔺',level:'intermediate',tags:['touch'],sets:3,workTime:60,restTime:40,reps:null,xp:42,unlockXP:60,coachTip:'Pyramid — build up and come back down.',desc:'30s inside rolls → 30s outside rolls → 30s sole rolls, no pause.',steps:['First 30s: inside of foot toe-taps.','Next 30s: outside of foot toe-taps.','Final 30s: sole rolls alternating feet.','No pause between phases.'],diagram:null},
+  {id:'t25',category:'touch',name:'Instep Cushion Drill',icon:'🎈',level:'intermediate',tags:['touch'],sets:4,workTime:0,restTime:20,reps:14,xp:28,unlockXP:0,coachTip:'A relaxed foot cushions better than a tense one.',desc:'Toss ball to various heights and cushion softly onto instep, holding for one second.',steps:['Toss ball to varying heights.','Meet ball with instep.','Foot should give slightly on contact.','Hold ball on instep for 1 second.'],diagram:null},
+  {id:'t26',category:'touch',name:'Around the World Juggle',icon:'🌍',level:'advanced',tags:['touch'],sets:3,workTime:0,restTime:40,reps:6,xp:58,unlockXP:150,coachTip:'Circle the foot completely before the ball drops.',desc:'While juggling, circle foot around the ball before it drops.',steps:['Get juggle going with dominant foot.','At apex of toss: swing foot in full circle around ball.','Land foot and continue juggling.','Count rep only if ball is not touched during circle.'],diagram:null},
+  {id:'t27',category:'touch',name:'Cross-Body First Touch',icon:'↕️',level:'advanced',tags:['touch'],sets:4,workTime:0,restTime:30,reps:12,xp:44,unlockXP:100,coachTip:'The cross-body touch opens space on the blind side.',desc:'Receive ball with right foot but direct it across to the left — and vice versa.',steps:['Roll ball toward right foot.','Use inside of right foot to redirect across body to left.','Ball must end up left of your centerline.','Reverse: ball to left foot, direct right.'],diagram:null},
+  {id:'t28',category:'touch',name:'Touch-Turn Combination',icon:'↩️',level:'advanced',tags:['touch'],sets:4,workTime:0,restTime:30,reps:10,xp:48,unlockXP:120,coachTip:"The touch IS the turn. Don't trap and then turn — it's one motion.",desc:'Receive ball and complete a 180° turn in a single touch.',steps:['Roll ball toward you.','Use outside of right foot to cut ball left as you spin right.','Complete 180° — ball in front of you in new direction.','Alternate turning direction each rep.'],diagram:null},
+  {id:'t29',category:'touch',name:'Seated Touch Control',icon:'🪑',level:'intermediate',tags:['touch'],sets:3,workTime:40,restTime:20,reps:null,xp:22,unlockXP:0,coachTip:'Seated juggling isolates your upper body touch completely.',desc:'Sit on ground and juggle using only thighs, chest and head.',steps:['Sit cross-legged or with legs extended.','Begin juggling with thigh.','Alternate thigh, chest, thigh, head.','No foot contact permitted.'],diagram:null},
+  {id:'t30',category:'touch',name:'Pressure First Touch Series',icon:'🚨',level:'elite',tags:['touch'],sets:4,workTime:0,restTime:40,reps:8,xp:70,unlockXP:400,coachTip:'In a match, your first touch must eliminate pressure.',desc:'Advanced first touch drill simulating game-speed pressure.',steps:['Roll ball firmly toward yourself.','Take first touch at match tempo.','Touch must travel at least 1m in chosen direction.','Follow with a second attacking touch.'],diagram:null},
+  {id:'d01',category:'dribble',name:'Scissors & Double Scissors',icon:'✂️',level:'intermediate',tags:['dribble','touch'],sets:4,workTime:45,restTime:30,reps:null,xp:30,unlockXP:0,coachTip:'Sell the scissors with your shoulder and eyes first.',desc:'Execute scissors and double scissors repeatedly on the spot.',steps:['Ball stationary. Stand over it.','Swing right foot around ball.','Push ball with outside of left foot.','For double: swing right, left, push with right outside.'],diagram:null},
+  {id:'d02',category:'dribble',name:'V-Cut Speed Drill',icon:'⚡',level:'intermediate',tags:['dribble','touch'],sets:5,workTime:40,restTime:25,reps:null,xp:35,unlockXP:30,coachTip:'The V should be tight — 30cm max.',desc:'Fast back-and-forth V-cuts using inside and sole of one foot.',steps:['Ball in front of you.','Right foot sole: pull back diagonally right.','Push diagonally forward-left with inside of right foot.','Do 10, switch to left foot.'],diagram:null},
+  {id:'d03',category:'dribble',name:'Elastico & Reverse Elastico',icon:'🌀',level:'advanced',tags:['dribble'],sets:4,workTime:0,restTime:30,reps:12,xp:50,unlockXP:100,coachTip:'The snap is everything — outside and inside touch almost simultaneously.',desc:'Fake outside with foot, snap inside to beat the defender.',steps:['Ball in front, standing still.','Outside of right foot on ball.','Push ball slightly right.','Instantly snap inside of same foot to cut ball hard left.'],diagram:null},
+  {id:'d04',category:'dribble',name:'Roulette (Zidane Turn)',icon:'🔄',level:'advanced',tags:['dribble','touch'],sets:4,workTime:0,restTime:35,reps:10,xp:55,unlockXP:150,coachTip:'Lean into the spin and use arms for balance.',desc:'The Zidane 360° spin.',steps:['Stand or dribble with ball.','Right sole: drag ball forward.','Plant left foot, begin spinning clockwise.','Right foot continues drag pulling ball backward.','Left sole picks up the ball.'],diagram:null},
+  {id:'d05',category:'dribble',name:'Step-Over Series',icon:'🔁',level:'intermediate',tags:['dribble'],sets:4,workTime:45,restTime:30,reps:null,xp:32,unlockXP:0,coachTip:'The step-over speed is the fake.',desc:'Continuous step-overs left and right, staying tight on the ball.',steps:['Ball stationary.','Step right foot over ball to left side.','Push ball right with outside of left foot.','Step left foot over ball to right side.','Push ball left with outside of right foot.'],diagram:null},
+  {id:'d06',category:'dribble',name:'Matthews Move',icon:'🦊',level:'intermediate',tags:['dribble'],sets:4,workTime:0,restTime:30,reps:12,xp:38,unlockXP:40,coachTip:'Drop your shoulder hard before the outside cut.',desc:'Shoulder drop fake one way, cut the ball the other.',steps:['Ball at feet.','Drop right shoulder dramatically right.','Shift weight right.','Cut ball hard to left with outside of right foot.'],diagram:null},
+  {id:'d07',category:'dribble',name:'Maradona Turn',icon:'🙌',level:'advanced',tags:['dribble'],sets:4,workTime:0,restTime:35,reps:10,xp:58,unlockXP:160,coachTip:'Two sole taps, then the spin — the tempo change is the trick.',desc:'Two-touch sole drag rotation.',steps:['Approach ball at pace.','Right sole: drag ball forward-right.','Plant body over ball.','360° spin — left sole: drag ball backward.'],diagram:null},
+  {id:'d08',category:'dribble',name:'Heel Flick Dribble',icon:'👟',level:'advanced',tags:['dribble'],sets:3,workTime:0,restTime:30,reps:10,xp:48,unlockXP:120,coachTip:'The heel flick only needs 30cm — precision, not power.',desc:'Roll ball forward, flick back with heel, continue in new direction.',steps:['Dribble forward 2 touches.','Plant foot alongside ball.','Flick ball backward with heel.','Spin and pick up ball going opposite direction.'],diagram:null},
+  {id:'d09',category:'dribble',name:'Rainbow Flick',icon:'🌈',level:'elite',tags:['dribble'],sets:3,workTime:0,restTime:40,reps:8,xp:75,unlockXP:400,coachTip:'Heel-toe-roll: three parts, one smooth motion.',desc:'Roll ball up behind standing leg with heel, flick over head with toe.',steps:['Ball at feet, slight crouch.','Trap ball between heels.','Roll ball up the back of standing leg.','Flick upward over head with toe.','Control on the other side.'],diagram:null},
+  {id:'d10',category:'dribble',name:'Chop Move',icon:'🪓',level:'intermediate',tags:['dribble'],sets:4,workTime:0,restTime:25,reps:12,xp:34,unlockXP:50,coachTip:'The chop works at speed — abrupt stop-and-cut beats the defender.',desc:'While dribbling at pace, chop ball sharply behind standing foot.',steps:['Dribble at half pace.','Plant right foot hard.','Chop ball behind right foot with right instep.','Ball redirected 90° to left.','Alternate: chop with left.'],diagram:null},
+  {id:'d11',category:'dribble',name:'Rivelino Fake Shot',icon:'💥',level:'advanced',tags:['dribble'],sets:4,workTime:0,restTime:30,reps:10,xp:50,unlockXP:130,coachTip:'Wind up with everything — then step over.',desc:'Fake a powerful shot, step over ball, dribble in opposite direction.',steps:['Ball at feet.','Wind up as if shooting hard with right foot.','Swing leg — but step over the ball.','Push ball right with outside of left foot.'],diagram:null},
+  {id:'d12',category:'dribble',name:'Okocha Behind-the-Leg',icon:'🎪',level:'elite',tags:['dribble'],sets:3,workTime:0,restTime:40,reps:8,xp:72,unlockXP:380,coachTip:'More effective from a stationary position — surprise is the weapon.',desc:'Pass ball behind standing leg with inside of foot.',steps:['Ball at feet.','Plant right foot.','Use inside of right foot to poke ball behind right leg.','Pick up with left foot.','Practice both sides.'],diagram:null},
+  {id:'d13',category:'dribble',name:'Ronaldo Chop',icon:'⚡',level:'advanced',tags:['dribble'],sets:4,workTime:0,restTime:30,reps:10,xp:52,unlockXP:170,coachTip:'Jump into the chop — body elevation sells the fake.',desc:'Two-footed jump-over fake then explosive inside cut.',steps:['Dribble at pace.','Jump and bring both feet near ball.','Land and immediately cut inside.','Explosive first step after the cut.'],diagram:null},
+  {id:'d14',category:'dribble',name:'Sole Roll Box Control',icon:'📦',level:'intermediate',tags:['dribble'],sets:4,workTime:50,restTime:25,reps:null,xp:36,unlockXP:20,coachTip:'Never let the ball travel more than 30cm from your feet.',desc:'Keep ball in a 50cm box using only sole rolls.',steps:['Imagine a 50cm box around the ball.','Sole roll forward, back, left, right.','Ball must never leave the box.','Add tempo — as fast as possible.'],diagram:null},
+  {id:'d15',category:'dribble',name:'Feint and Drive',icon:'🏎️',level:'intermediate',tags:['dribble'],sets:4,workTime:0,restTime:25,reps:12,xp:30,unlockXP:0,coachTip:'The feint is worthless without the drive. Commit to both.',desc:'Body feint one direction, drive the ball decisively the other.',steps:['Ball at feet.','Dip shoulder hard right, shift weight.','Push ball left with outside of left foot.','Drive left for 2–3 touches.','Repeat, alternating sides.'],diagram:null},
+  {id:'d16',category:'dribble',name:'Drag-Back Turn',icon:'↩️',level:'intermediate',tags:['dribble','touch'],sets:4,workTime:40,restTime:25,reps:null,xp:30,unlockXP:0,coachTip:'Pull the ball all the way back before turning.',desc:'Full drag-back with sole, complete 180° turn, drive in new direction.',steps:['Dribble forward.','Sole on top of ball — pull straight back.','Pivot 180° on standing foot.','Push ball forward with instep.'],diagram:null},
+  {id:'d17',category:'dribble',name:'Nutmeg Setup Drill',icon:'🥜',level:'advanced',tags:['dribble'],sets:4,workTime:0,restTime:30,reps:10,xp:50,unlockXP:140,coachTip:"A nutmeg is engineered — push the defender onto their heels first.",desc:"Simulate nutmeg approach: body fake to spread defender's legs, then roll through.",steps:['Use a cone as defender.','Approach and fake wide right.','Roll ball firmly between cone legs.','Follow and control on other side.'],diagram:null},
+  {id:'d18',category:'dribble',name:'Speed Dribble Burst',icon:'💨',level:'intermediate',tags:['dribble'],sets:5,workTime:20,restTime:30,reps:null,xp:28,unlockXP:0,coachTip:'Keep touches in front of you — not to the side.',desc:'Maximum speed dribble then sharp deceleration to controlled stop.',steps:['Dribble ball forward at max effort.','Small quick touches — ball no more than 1.5m ahead.','At 10m mark, kill the ball dead.','Turn and repeat.'],diagram:null},
+  {id:'d19',category:'dribble',name:'Pendulum Move',icon:'🕰️',level:'advanced',tags:['dribble'],sets:4,workTime:0,restTime:30,reps:10,xp:46,unlockXP:110,coachTip:"The pendulum is all timing — match the defender's weight transfer.",desc:'Inside-outside pendulum with one foot.',steps:['Ball at feet.','Swing right foot as if touching inside of ball (fake).','Continue swing outward — outside of right foot cuts ball right.','Repeat: fake outside, cut inside.'],diagram:null},
+  {id:'d20',category:'dribble',name:'Three-Touch Combination',icon:'🔢',level:'intermediate',tags:['dribble','touch'],sets:4,workTime:50,restTime:30,reps:null,xp:36,unlockXP:40,coachTip:'Touch 1 sets, touch 2 beats, touch 3 goes.',desc:'Every three-touch sequence simulates receiving, beating a defender, driving away.',steps:['Touch 1: inside foot control.','Touch 2: step-over or scissors fake.','Touch 3: decisive outside foot drive.','Continuous: 3-touch, 3-touch, 3-touch.'],diagram:null},
+  {id:'d21',category:'dribble',name:'Wall Dribble Mirror',icon:'🪞',level:'intermediate',tags:['dribble'],sets:4,workTime:50,restTime:30,reps:null,xp:34,unlockXP:30,coachTip:'Use the wall as a reference for tight control.',desc:'Dribble parallel to wall within 40cm of the surface.',steps:['Stand parallel to wall, 30cm away.','Dribble along wall — ball stays between you and wall.','If ball hits wall, rep is void.','Increase speed each set.'],diagram:null},
+  {id:'d22',category:'dribble',name:'Ball Rollover Series',icon:'🔁',level:'intermediate',tags:['dribble','touch'],sets:5,workTime:40,restTime:25,reps:null,xp:28,unlockXP:0,coachTip:'Rollovers are best when they\'re quiet — keep them tight.',desc:'Continuous rollovers — alternate feet rolling ball side to side.',steps:['Ball at feet.','Right foot rolls ball left.','Left foot stops and rolls right.','Keep ball within 50cm of feet.'],diagram:null},
+  {id:'d23',category:'dribble',name:'Explode & Brake',icon:'🚦',level:'intermediate',tags:['dribble'],sets:5,workTime:30,restTime:30,reps:null,xp:30,unlockXP:0,coachTip:'The brake is as important as the explosion.',desc:'Explosive 5-touch dribble burst followed by immediate dead stop.',steps:['Ball at feet.','Explode forward — 5 aggressive touches.','On touch 5: sole trap, dead stop.','Hold stop 1 second.','Explode back the other way.'],diagram:null},
+  {id:'d24',category:'dribble',name:'Tight Space Survival',icon:'📍',level:'advanced',tags:['dribble'],sets:4,workTime:60,restTime:40,reps:null,xp:55,unlockXP:160,coachTip:'Elite tight-space dribbling is 90% body position.',desc:'Confined to a 1m×1m area, dribble and change direction continuously.',steps:['Mark a 1m×1m box.','Dribble inside — never leave it.','Constant direction changes.','Touch ball every 1.5 seconds minimum.'],diagram:'  [1m x 1m box]\n  ┌─────────┐\n  │ dribble │\n  │ inside  │\n  └─────────┘'},
+  {id:'d25',category:'dribble',name:'Cruyff to Sprint',icon:'🦅',level:'advanced',tags:['dribble'],sets:4,workTime:0,restTime:35,reps:10,xp:52,unlockXP:150,coachTip:"Wind up like you're crossing or shooting. That commitment makes it work.",desc:'Fake cross or shot, drag ball behind planted foot and sprint opposite.',steps:['Dribble toward imaginary defender.','Wind up as if crossing.','Drag ball behind left plant foot with right instep.','Spin 180° and sprint.'],diagram:null},
+  {id:'d26',category:'dribble',name:'Rapid Direction Sequence',icon:'🧩',level:'advanced',tags:['dribble'],sets:4,workTime:45,restTime:35,reps:null,xp:48,unlockXP:120,coachTip:"Don't look at the ball — it should follow your body.",desc:'Pre-programmed sequence: forward 3, cut left, forward 3, cut right, spin back.',steps:['Dribble 3 touches forward.','Sharp inside cut left.','3 touches forward.','Sharp inside cut right.','Sole drag — full reverse.'],diagram:null},
+  {id:'d27',category:'dribble',name:'Tunnel Vision Dribble',icon:'👁️',level:'advanced',tags:['dribble'],sets:4,workTime:50,restTime:35,reps:null,xp:50,unlockXP:140,coachTip:'Eyes front every single touch.',desc:'Dribble entire set with head and eyes pointed forward, never looking at the ball.',steps:['Set a visual target on the wall.','Dribble freely in space.','Eyes must not drop to ball.','If you look down: stop and reset.'],diagram:null},
+  {id:'d28',category:'dribble',name:'Stop-and-Go Rhythm',icon:'⏱️',level:'intermediate',tags:['dribble'],sets:5,workTime:40,restTime:25,reps:null,xp:30,unlockXP:0,coachTip:'The STOP is the weapon — the GO is just the response.',desc:'Alternating full stops and accelerations.',steps:['Dribble forward at moderate pace.','Every 3 seconds: dead stop.','Hold 1 second.','Explosive acceleration.'],diagram:null},
+  {id:'d29',category:'dribble',name:'Low Center of Gravity Drill',icon:'🏋️',level:'advanced',tags:['dribble'],sets:4,workTime:50,restTime:35,reps:null,xp:46,unlockXP:100,coachTip:'Get genuinely low — thighs parallel to ground.',desc:'Dribble in deep squat position — forces low COG mechanics.',steps:['Get into a partial squat position.','Dribble forward in squat.','Inside-outside alternation.','Cannot stand up during the set.'],diagram:null},
+  {id:'d30',category:'dribble',name:'Full Move Freestyle',icon:'🎨',level:'elite',tags:['dribble'],sets:3,workTime:90,restTime:60,reps:null,xp:80,unlockXP:500,coachTip:'No script — react, improvise, trust your instincts.',desc:'90 seconds of pure freestyle dribbling using any move learned.',steps:['No script — improvise.','Each move must flow into the next.','Minimum: 5 different moves per set.','Stay in a 3m×3m area.'],diagram:null},
+  {id:'c01',category:'cone',name:'Tight Cone Slalom',icon:'🏁',level:'intermediate',tags:['cone','dribble'],sets:6,workTime:0,restTime:20,reps:8,xp:35,unlockXP:0,coachTip:'Stay low. One touch between each cone.',desc:'5 cones in a line, 50cm apart. Weave through at speed.',steps:['5 cones, 50cm apart.','Weave through all 5 and back = 1 rep.','Sets 1–2: right foot only.','Sets 3–4: left foot only.','Sets 5–6: both feet.'],diagram:'  Start\n [C]\n [C]\n [C]\n [C]\n [C]'},
+  {id:'c02',category:'cone',name:'Square Box Dribble',icon:'⬛',level:'intermediate',tags:['cone','dribble'],sets:5,workTime:50,restTime:25,reps:null,xp:40,unlockXP:50,coachTip:'The corner is where the drill lives.',desc:'4 cones in a 1.5m square. Dribble the perimeter.',steps:['4 cones in a 1.5x1.5m square.','Dribble clockwise.','At each cone: dead stop, then explode.','2 laps clockwise, then reverse.'],diagram:'  [C]---[C]\n   |       |\n  [C]---[C]'},
+  {id:'c03',category:'cone',name:'L-Shape Pass Pattern',icon:'📐',level:'advanced',tags:['cone','pass','touch'],sets:4,workTime:60,restTime:35,reps:null,xp:55,unlockXP:120,coachTip:'Keep your head up through the cones.',desc:'L-shaped cone layout with wall. Dribble L, play pass, receive, repeat.',steps:['3 cones in a line (60cm apart), 1 cone 60cm to side.','Dribble through the L.','Play firm pass to wall.','Control rebound, dribble back.'],diagram:'  [C]\n   |\n  [C]\n   |\n  [C]--[C]-> WALL'},
+  {id:'c04',category:'cone',name:'Star Pattern Drill',icon:'⭐',level:'advanced',tags:['cone','dribble'],sets:5,workTime:0,restTime:40,reps:5,xp:60,unlockXP:200,coachTip:'Plant your non-dribbling foot hard at each outer cone.',desc:'5 cones in a star. Sprint-dribble to each outer point and back.',steps:['Center cone, 4 outer cones 2m away.','1 rep = dribble to all 4 outer cones and back.','Outside foot touch at each outer cone.'],diagram:'     [C]\n      |\n [C]-[C]-[C]\n      |\n     [C]'},
+  {id:'c05',category:'cone',name:'Figure-8 Cone Dribble',icon:'8️⃣',level:'intermediate',tags:['cone','dribble'],sets:5,workTime:0,restTime:25,reps:10,xp:32,unlockXP:0,coachTip:'Forces both inside and outside foot use with natural weight transfers.',desc:'2 cones 1.5m apart. Dribble in a figure-8 pattern.',steps:['Place 2 cones 1.5m apart.','Weave around cone 1, then cone 2.','1 full loop = 1 rep.'],diagram:'  [C]   [C]'},
+  {id:'c06',category:'cone',name:'T-Shape Cone Run',icon:'🔤',level:'intermediate',tags:['cone','dribble'],sets:4,workTime:0,restTime:30,reps:6,xp:38,unlockXP:60,coachTip:'The lateral shuffles in the T-shape separate good from great.',desc:'Classic T-drill with ball.',steps:['4 cones: 1 start, 1 center, 1 left, 1 right.','Sprint-dribble to center.','Lateral dribble to left cone.','Lateral dribble across to right cone.','Sprint back.'],diagram:'  [L]--[C]--[R]\n       |\n      [S]'},
+  {id:'c07',category:'cone',name:'Zig-Zag Cone Burst',icon:'⚡',level:'intermediate',tags:['cone','dribble'],sets:5,workTime:0,restTime:25,reps:8,xp:34,unlockXP:30,coachTip:'Attack each cone with pace. Decelerate AT the cone.',desc:'5 cones in zig-zag pattern 1m apart. Attack each angle at speed.',steps:['5 cones in alternating left-right, 1m spacing.','Dribble to each cone at full pace.','Sharp cut at each cone.'],diagram:'  [C]\n    [C]\n  [C]\n    [C]\n  [C]'},
+  {id:'c08',category:'cone',name:'Cone Gate Passing',icon:'🚪',level:'intermediate',tags:['cone','pass','touch'],sets:4,workTime:60,restTime:30,reps:null,xp:36,unlockXP:40,coachTip:'Aim at the center of the gate every time.',desc:'4 small gates (pairs of cones 40cm apart). Pass through each gate.',steps:['4 gates in circular pattern.','Pass ball through gate 1.','Jog to receive, pass through gate 2.','Continue through all 4.'],diagram:null},
+  {id:'c09',category:'cone',name:'Cone Box Escape',icon:'🏃',level:'advanced',tags:['cone','dribble'],sets:4,workTime:0,restTime:35,reps:8,xp:50,unlockXP:130,coachTip:'Simulate a defender in each direction — escape must be decisive.',desc:'Start in 1m×1m cone box, execute escape move, drive to outer cone.',steps:['1m×1m box with 4 cones.','Start inside box.','Execute scissors or V-cut to escape.','Drive to outer cone 3m away.','Return and repeat.'],diagram:null},
+  {id:'c10',category:'cone',name:'Cone Slalom to Wall',icon:'🌊',level:'intermediate',tags:['cone','dribble','pass'],sets:4,workTime:0,restTime:30,reps:8,xp:40,unlockXP:50,coachTip:'The pass after the slalom must be precise.',desc:'Slalom through 4 cones then strike a pass to wall.',steps:['4 cones in a line, 60cm apart.','Slalom through all cones.','Strike pass to wall.','Control rebound in one touch.','Dribble back.'],diagram:null},
+  {id:'c11',category:'cone',name:'Pentagon Cone Drill',icon:'⬠',level:'advanced',tags:['cone','dribble'],sets:4,workTime:0,restTime:35,reps:5,xp:55,unlockXP:180,coachTip:'Each angle demands a different body position.',desc:'5 cones in a pentagon. Dribble to each and back to center.',steps:['5 cones in pentagon, each 1.5m from center.','Dribble to cone 1, outside touch.','Return to center.','Continue to cone 2, 3, 4, 5.'],diagram:null},
+  {id:'c12',category:'cone',name:'Rapid Cone Touch',icon:'👆',level:'intermediate',tags:['cone'],sets:5,workTime:30,restTime:20,reps:null,xp:24,unlockXP:0,coachTip:'React with your feet, not your eyes.',desc:'Sprint between 2 cones 2m apart, tapping top of each cone with sole.',steps:['Place 2 cones 2m apart.','Sprint right, tap right cone with sole.','Sprint left, tap left cone.','Continuous for duration.'],diagram:'  [C]--2m--[C]'},
+  {id:'c13',category:'cone',name:'Diamond Dribble',icon:'💎',level:'advanced',tags:['cone','dribble'],sets:4,workTime:0,restTime:35,reps:6,xp:52,unlockXP:160,coachTip:'Attack the top and bottom at pace, slow for the tight side angles.',desc:'4 cones in a diamond. Dribble the full shape.',steps:['4 cones: top, left, bottom, right. Each 1.5m from center.','Start at bottom cone.','Dribble clockwise around all 4.','Execute a different move at each cone.'],diagram:'     [T]\n  [L]   [R]\n     [B]'},
+  {id:'c14',category:'cone',name:'Cone to Cone Sprint Dribble',icon:'🏃',level:'intermediate',tags:['cone','dribble'],sets:6,workTime:0,restTime:20,reps:8,xp:28,unlockXP:0,coachTip:'Every touch between cones should be a controlled push.',desc:'2 cones 5m apart. Sprint dribble between them.',steps:['Place 2 cones 5m apart.','Sprint dribble from cone 1 to cone 2.','Control at cone 2.','Turn and repeat.'],diagram:'  [C]--5m--[C]'},
+  {id:'c15',category:'cone',name:'Inside-Out Cone Weave',icon:'↔️',level:'intermediate',tags:['cone','dribble'],sets:5,workTime:0,restTime:25,reps:8,xp:32,unlockXP:20,coachTip:'Inside only going out, outside only coming back.',desc:'6 cones in a line, alternating surfaces each direction.',steps:['6 cones in a line, 50cm apart.','Going through: inside of foot only.','Coming back: outside of foot only.'],diagram:null},
+  {id:'c16',category:'cone',name:'Crossover Cone Drill',icon:'✖️',level:'advanced',tags:['cone','dribble'],sets:4,workTime:0,restTime:30,reps:8,xp:46,unlockXP:120,coachTip:'The crossover step at pace is a rare skill.',desc:'5 cones in a line. Dribble using crossover steps.',steps:['5 cones, 60cm apart.','Approach at a slight diagonal.','One foot crosses in front of the other to redirect ball.','Alternate crossing foot each cone.'],diagram:null},
+  {id:'c17',category:'cone',name:'3-Cone Triangle',icon:'🔺',level:'intermediate',tags:['cone','dribble'],sets:5,workTime:0,restTime:25,reps:8,xp:35,unlockXP:40,coachTip:'Lean into each corner — your weight shift drives direction change.',desc:'3 cones in a triangle. Dribble around all 3.',steps:['3 cones in equilateral triangle, sides 1.5m.','Dribble clockwise.','On return rep: counter-clockwise.','Check-step before each direction change.'],diagram:'    [C]\n  [C] [C]'},
+  {id:'c18',category:'cone',name:'Speed Gate Drill',icon:'🚀',level:'advanced',tags:['cone','dribble'],sets:5,workTime:0,restTime:25,reps:10,xp:44,unlockXP:100,coachTip:'If the ball clips a cone, the touch was sloppy.',desc:'4 pairs of cones as gates, 40cm wide. Sprint through each gate.',steps:['4 gates in a line, 1.5m apart.','Sprint-dribble through each gate.','Ball must pass through gate center.','Max 2 touches between gates.'],diagram:null},
+  {id:'c19',category:'cone',name:'Angled Approach Cone Work',icon:'📏',level:'advanced',tags:['cone','dribble'],sets:4,workTime:0,restTime:30,reps:8,xp:48,unlockXP:130,coachTip:'Always approach at an angle — a straight run gives the defender a straight read.',desc:'Single cone: approach at 45°, cut around, drive away at new angle.',steps:['1 cone in center.','Approach from bottom-left at 45°.','Execute a move at cone.','Drive away toward bottom-right.'],diagram:null},
+  {id:'c20',category:'cone',name:'Cone Dribble & Fake',icon:'🎭',level:'intermediate',tags:['cone','dribble'],sets:4,workTime:0,restTime:25,reps:10,xp:36,unlockXP:50,coachTip:"Approach each cone as if it's a real defender.",desc:'4 cones in a line. Execute a fake move at every cone.',steps:['4 cones, 1.5m apart.','Cone 1: scissors.','Cone 2: step-over.','Cone 3: V-cut.','Cone 4: Matthews move.'],diagram:null},
+  {id:'c21',category:'cone',name:'Lateral Cone Shuffle',icon:'↕️',level:'intermediate',tags:['cone'],sets:5,workTime:40,restTime:25,reps:null,xp:26,unlockXP:0,coachTip:'Stay low throughout — never stand upright between cones.',desc:'5 cones 1m apart. Lateral shuffle dribble.',steps:['5 cones in a line, 1m apart.','Lateral shuffle right — inside touches.','At end: roll ball back, shuffle left.'],diagram:null},
+  {id:'c22',category:'cone',name:'Cone Maze Freestyle',icon:'🗺️',level:'advanced',tags:['cone','dribble'],sets:3,workTime:90,restTime:60,reps:null,xp:65,unlockXP:250,coachTip:'Use the full 90 seconds — use the space intelligently.',desc:'8 cones in any formation. Free dribble 90 seconds.',steps:['Place 8 cones in any pattern.','Dribble freely through all 8.','Every cone touched at least once per 30 seconds.','Use at least 3 different moves.'],diagram:null},
+  {id:'c23',category:'cone',name:'Cone Wall Combo',icon:'🧱',level:'advanced',tags:['cone','dribble','pass'],sets:4,workTime:0,restTime:35,reps:8,xp:55,unlockXP:180,coachTip:'The pass must come immediately out of the last cone.',desc:'Slalom 4 cones then immediately play a first-time pass to the wall.',steps:['4 cones in slalom, 3m from wall.','Slalom through cones.','Exit last cone: pass to wall.','Control rebound in one touch.'],diagram:null},
+  {id:'c24',category:'cone',name:'Micro Cone Touch Drill',icon:'🔬',level:'elite',tags:['cone','touch'],sets:4,workTime:60,restTime:45,reps:null,xp:68,unlockXP:350,coachTip:'Quality of touch, not speed. Most technically demanding drill.',desc:'4 cones just 25cm apart. Dribble between them with maximum precision.',steps:['4 cones in a line, 25cm apart.','Ball must not touch any cone.','Fewest touches possible.','1 cone touch = restart.'],diagram:'  [C][C][C][C]\n  <-25cm gap->'},
+  {id:'c25',category:'cone',name:'Cone Circle Dribble',icon:'🔵',level:'intermediate',tags:['cone','dribble'],sets:4,workTime:50,restTime:30,reps:null,xp:38,unlockXP:60,coachTip:'Keep the ball on the inside of the circle.',desc:'6 cones in a 2m diameter circle. Dribble inside continuously.',steps:['6 cones in a circle, 2m diameter.','Dribble inside boundary.','Ball must stay inside.','Change direction every 10 seconds.'],diagram:null},
+  {id:'x01',category:'combo',name:'Gatinho Combo',icon:'🇧🇷',level:'advanced',tags:['touch','dribble'],sets:4,workTime:0,restTime:35,reps:10,xp:65,unlockXP:180,coachTip:'Your body goes one way before you spin.',desc:'Brazilian futsal move — outside touch, body fake, 180° spin.',steps:['Ball at feet.','Fake right with eyes, shoulders, body weight.','Touch ball outside of left foot to the left.','Spin 180° clockwise.','Collect ball on other side.'],diagram:null},
+  {id:'x02',category:'combo',name:'Cruyff to Sprint',icon:'🦅',level:'advanced',tags:['dribble','cone'],sets:5,workTime:0,restTime:35,reps:8,xp:60,unlockXP:150,coachTip:"Commit to the fake — a half-hearted wind-up doesn't beat anyone.",desc:'Classic Cruyff turn into a 3-cone sprint.',steps:['3 cones in a line, 1.5m apart.','Dribble toward center cone.','Wind up as if crossing or shooting.','Drag ball behind planted foot.','Sprint through cones.'],diagram:'  [C]-[C]-[C]'},
+  {id:'x03',category:'combo',name:'Full Combo Series',icon:'💎',level:'elite',tags:['touch','dribble'],sets:3,workTime:0,restTime:60,reps:6,xp:100,unlockXP:400,coachTip:'Go slow enough to be clean first.',desc:'V-cut to Scissors to Roulette to Elastico in one flowing sequence.',steps:['2 V-cuts (one per foot).','Transition to scissors.','Exit scissors into roulette.','Coming out of roulette: elastico.'],diagram:null},
+  {id:'x04',category:'combo',name:'Scissor-to-Drive Combo',icon:'✂️',level:'intermediate',tags:['dribble','touch'],sets:4,workTime:0,restTime:30,reps:12,xp:45,unlockXP:80,coachTip:'The drive after scissors must be decisive.',desc:'Single scissors followed immediately by an explosive outside-foot drive.',steps:['Ball at feet.','Execute full scissors with right foot.','Push ball with outside of right foot.','Accelerate 3 touches.','Repeat opposite direction.'],diagram:null},
+  {id:'x05',category:'combo',name:'Step-over to Elastico',icon:'🎯',level:'advanced',tags:['dribble'],sets:3,workTime:0,restTime:40,reps:8,xp:68,unlockXP:200,coachTip:'Two step-overs sell the first direction, elastico confirms the second.',desc:'Double step-over into an elastico.',steps:['Ball stationary.','Double step-over — right, left.','Exit into elastico: outside fake, inside snap.'],diagram:null},
+  {id:'x06',category:'combo',name:'Roulette to Acceleration',icon:'🚀',level:'advanced',tags:['dribble','touch'],sets:4,workTime:0,restTime:35,reps:10,xp:62,unlockXP:170,coachTip:'Your first touch out of the roulette sets the angle of acceleration.',desc:'Roulette spin then immediate 5-touch sprint.',steps:['Ball at feet.','Execute full roulette.','First touch out of turn sets sprint angle.','5 aggressive sprint touches.'],diagram:null},
+  {id:'x07',category:'combo',name:'V-Cut to Cruyff',icon:'↩️',level:'advanced',tags:['dribble','touch'],sets:4,workTime:0,restTime:35,reps:10,xp:60,unlockXP:160,coachTip:'The V-cut slows the defender; the Cruyff beats them.',desc:'V-cut to slow defender, then Cruyff turn to change direction.',steps:['Ball at feet.','Execute 2 rapid V-cuts.','Transition into Cruyff drag-behind.','Sprint in new direction.'],diagram:null},
+  {id:'x08',category:'combo',name:'Matthews to Scissors',icon:'🦊',level:'advanced',tags:['dribble'],sets:4,workTime:0,restTime:30,reps:10,xp:55,unlockXP:140,coachTip:'The Matthews shoulder drop sets up the scissors.',desc:'Matthews shoulder fake followed by scissors.',steps:['Ball at feet.','Full Matthews shoulder drop left.','Transition into scissors right.','Push with outside of left foot and drive.'],diagram:null},
+  {id:'x09',category:'combo',name:'Sole Roll to Heel Flick',icon:'👟',level:'advanced',tags:['dribble','touch'],sets:3,workTime:0,restTime:40,reps:8,xp:60,unlockXP:180,coachTip:'The roll slows the defender; the heel flick wrong-foots them.',desc:'Sole roll drag-back followed immediately by heel flick.',steps:['Dribble forward.','Sole drag-back.','Plant alongside ball.','Heel flick backward.','Spin and accelerate.'],diagram:null},
+  {id:'x10',category:'combo',name:'Chest-Thigh-Volley-Drive',icon:'🎪',level:'advanced',tags:['touch','dribble'],sets:3,workTime:0,restTime:45,reps:8,xp:70,unlockXP:220,coachTip:'Each element feeds the next.',desc:'Full aerial-to-ground combination. Chest to thigh to volley kill to drive.',steps:['Throw ball to chest height.','Chest cushion upward.','Thigh redirect downward.','Volley kill to ground.','Drive forward 3 touches.'],diagram:null},
+  {id:'x11',category:'combo',name:'Cone Slalom to Roulette',icon:'🌀',level:'advanced',tags:['cone','dribble'],sets:4,workTime:0,restTime:35,reps:8,xp:62,unlockXP:190,coachTip:'Build speed through the cones so the roulette feels natural.',desc:'Slalom 4 cones, exit into a roulette turn.',steps:['4 cones in slalom line.','Slalom at pace.','At last cone: roulette.','Continue in new direction.'],diagram:null},
+  {id:'x12',category:'combo',name:'Rivelino-Chop Combo',icon:'💥',level:'advanced',tags:['dribble'],sets:4,workTime:0,restTime:35,reps:8,xp:58,unlockXP:160,coachTip:'Rivelino fake draws the commitment; the chop is the execution.',desc:'Rivelino fake shot into immediate chop turn.',steps:['Ball at feet.','Wind up Rivelino fake.','Step over ball.','Chop ball behind standing foot.','Explode in new direction.'],diagram:null},
+  {id:'x13',category:'combo',name:'Wall Rebound to Move',icon:'🧱',level:'advanced',tags:['touch','dribble'],sets:4,workTime:60,restTime:40,reps:null,xp:65,unlockXP:200,coachTip:'The move must happen immediately on receiving the rebound.',desc:'Pass to wall, receive on the run, execute a dribble move immediately.',steps:['Pass to wall.','As ball returns, receive at pace.','Immediately execute a move.','No pause between receive and move.'],diagram:null},
+  {id:'x14',category:'combo',name:'Double Move Chain',icon:'🔗',level:'elite',tags:['dribble'],sets:3,workTime:0,restTime:55,reps:8,xp:80,unlockXP:350,coachTip:'The chain only works at pace.',desc:'Two consecutive dribble moves with no pause.',steps:['Ball at feet or slow dribble.','Move 1: any move.','Without stopping: move 2.','Ball must stay in motion throughout.'],diagram:null},
+  {id:'x15',category:'combo',name:'Street Skill Medley',icon:'🎭',level:'elite',tags:['dribble','touch'],sets:3,workTime:90,restTime:60,reps:null,xp:90,unlockXP:450,coachTip:'Trust your instincts.',desc:'90 seconds using only the hardest moves.',steps:['No scripted order.','Cycle through: elastico, roulette, heel flick, rainbow, Maradona.','Each move must appear at least once.','Stay in a 2m×2m zone.'],diagram:null},
+  {id:'x16',category:'combo',name:'Receive-Turn-Drive Combo',icon:'🏎️',level:'intermediate',tags:['touch','dribble'],sets:4,workTime:0,restTime:30,reps:12,xp:42,unlockXP:80,coachTip:'The turn is part of the touch — never separate them.',desc:'Receive rolling ball, complete 180° turn in one touch, drive 5 paces.',steps:['Roll ball toward you from 2m.','Touch-turn — one motion.','Drive forward 5 touches.','Alternate turning direction.'],diagram:null},
+  {id:'x17',category:'combo',name:'Fake-Pass to Dribble',icon:'😤',level:'advanced',tags:['dribble','pass'],sets:4,workTime:0,restTime:30,reps:10,xp:52,unlockXP:140,coachTip:'Commit your entire body to the pass fake.',desc:'Simulate a fake pass — full wind-up — then retract and dribble.',steps:['Ball at feet.','Wind up full pass motion right.','Pull back before contact.','Push ball left with outside of left foot.'],diagram:null},
+  {id:'x18',category:'combo',name:'Cone to Wall Combo',icon:'🏰',level:'advanced',tags:['cone','pass','touch'],sets:4,workTime:0,restTime:35,reps:8,xp:58,unlockXP:170,coachTip:'The final pass must be as clean as a standing strike.',desc:'3-cone slalom, exit, play wall pass, receive, return.',steps:['3 cones in slalom, 3m from wall.','Slalom through cones.','Play wall pass with dominant foot.','Receive with weak foot.','Dribble back.'],diagram:null},
+  {id:'x19',category:'combo',name:'Full Field Simulation',icon:'🏟️',level:'elite',tags:['dribble','touch','cone'],sets:3,workTime:120,restTime:90,reps:null,xp:110,unlockXP:500,coachTip:'Play at match pace.',desc:'2-minute full simulation — combine cone work, dribbling, and wall passes.',steps:['Set up 6 cones and mark wall.','2 minutes continuous.','Must include: slalom, wall pass, at least 2 moves.'],diagram:null},
+  {id:'x20',category:'combo',name:'Pressure Escape Combo',icon:'🚨',level:'elite',tags:['dribble','touch'],sets:4,workTime:0,restTime:50,reps:8,xp:95,unlockXP:450,coachTip:'Picture two defenders closing fast.',desc:'Simulate being closed down from two directions.',steps:['Ball at feet.','Imagine pressure from front and right.','Touch 1: shield.','Touch 2: escape front.','Touch 3: escape side.','Drive away.'],diagram:null}
+];
+
+const TRACKS = [
+  {id:'touch',name:'🎯 Touch Foundation',desc:'Master elite first touch, aerial control, and ball reception.',color:'#00c97a',
+    sessions:[
+      {id:'tf1',name:'Session 1 – First Contact',desc:'25 min · The fundamentals of a clean first touch.',xpBonus:80,unlockXP:0,totalTime:25,drills:['t01','t02','t03','t10','t15','t16']},
+      {id:'tf2',name:'Session 2 – Wall & Weak Foot',desc:'28 min · Introduce wall work and weak foot.',xpBonus:100,unlockXP:0,totalTime:28,drills:['t04','t08','t13','t23','t22','t14']},
+      {id:'tf3',name:'Session 3 – Aerial & Body',desc:'32 min · Chest, thigh, head — full body touch.',xpBonus:120,unlockXP:0,totalTime:32,drills:['t05','t06','t09','t17','t25','t29']},
+      {id:'tf4',name:'Session 4 – Elite Touch',desc:'35 min · Advanced directional touch under pressure.',xpBonus:150,unlockXP:0,totalTime:35,drills:['t11','t12','t18','t19','t27','t28','t30']}
+    ]},
+  {id:'cone',name:'🏁 Cone Commander',desc:'From basic slaloms to elite cone patterns and combinations.',color:'#f5a623',
+    sessions:[
+      {id:'cc1',name:'Session 1 – Slalom Basics',desc:'22 min · Build cone confidence.',xpBonus:80,unlockXP:0,totalTime:22,drills:['c01','c05','c12','c14','c21','c17']},
+      {id:'cc2',name:'Session 2 – Box & Gate Work',desc:'28 min · Tighter control through structured patterns.',xpBonus:100,unlockXP:0,totalTime:28,drills:['c02','c06','c08','c07','c15','c13']},
+      {id:'cc3',name:'Session 3 – Complex Patterns',desc:'32 min · Multi-cone layouts and speed emphasis.',xpBonus:130,unlockXP:0,totalTime:32,drills:['c03','c04','c09','c10','c16','c18','c19']},
+      {id:'cc4',name:'Session 4 – Elite Cone Mastery',desc:'38 min · Complex layouts and move combinations.',xpBonus:160,unlockXP:0,totalTime:38,drills:['c11','c20','c22','c23','c24','c25','c04']}
+    ]},
+  {id:'street',name:'🌀 Street Skills',desc:'Scissors, elastico, roulette, rainbow — street football weapons.',color:'#c07aff',
+    sessions:[
+      {id:'ss1',name:'Session 1 – Basics & Scissors',desc:'25 min · Foundational street moves.',xpBonus:90,unlockXP:0,totalTime:25,drills:['d01','d02','d05','d10','d15','d16']},
+      {id:'ss2',name:'Session 2 – Fakes & Cuts',desc:'28 min · Deception and close-quarters cutting.',xpBonus:110,unlockXP:0,totalTime:28,drills:['d06','d11','d17','d19','d20','d14']},
+      {id:'ss3',name:'Session 3 – Advanced Moves',desc:'32 min · Elastico, roulette, Maradona.',xpBonus:140,unlockXP:0,totalTime:32,drills:['d03','d04','d07','d25','d08','d13']},
+      {id:'ss4',name:'Session 4 – Elite Street',desc:'38 min · Rainbow, okocha, full freestyle.',xpBonus:180,unlockXP:0,totalTime:38,drills:['d09','d12','d24','d26','d27','d29','d30']}
+    ]},
+  {id:'elite',name:'💎 Elite Baller',desc:'The hardest sessions. All systems combined at match pace.',color:'#e84040',
+    sessions:[
+      {id:'eb1',name:'Session 1 – Combo Introduction',desc:'30 min · Learn to chain moves together.',xpBonus:120,unlockXP:200,totalTime:30,drills:['x04','x05','x07','x16','x02','x06']},
+      {id:'eb2',name:'Session 2 – Wall & Cone Combos',desc:'35 min · Combine cone work with wall passes.',xpBonus:150,unlockXP:300,totalTime:35,drills:['x11','x13','x18','x08','x09','x12']},
+      {id:'eb3',name:'Session 3 – Full Chain Drills',desc:'38 min · Double and triple move chains.',xpBonus:180,unlockXP:400,totalTime:38,drills:['x01','x03','x10','x14','x17','x15']},
+      {id:'eb4',name:'Session 4 – Match Simulation',desc:'45 min · Full match-pace pressure simulation.',xpBonus:250,unlockXP:600,totalTime:45,drills:['x19','x20','x15','x14','d30','t30']}
+    ]}
+];
+
+const LEVELS = [
+  {name:'Ball Striker',xp:0},{name:'Technical Player',xp:200},{name:'Street Footballer',xp:500},
+  {name:'Advanced Dribbler',xp:900},{name:'Touch Maestro',xp:1400},{name:'Elite Baller',xp:2000},{name:'Futsal Legend',xp:3000}
+];
+
+let state = {
+  xp:0,drillsDone:0,sessionsDone:0,streak:0,minutesTrained:0,
+  weekDays:[false,false,false,false,false,false,false],
+  drillProgress:{},sessionProgress:{},activityLog:[]
+};
+
+let activeFilter = 'all';
+let currentDrill = null;
+let currentSession = null;
+let sessionDrillIndex = 0;
+let DT = {interval:null,seconds:0,paused:false,set:1,totalSets:3,phase:'work'};
+let ST = {interval:null,seconds:0,paused:false,set:1,totalSets:1,phase:'work',drill:null};
+
+function save(){ localStorage.setItem('touchlab5',JSON.stringify(state)); }
+function load(){ const s=localStorage.getItem('touchlab5'); if(s) state={...state,...JSON.parse(s)}; }
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  ['home','drills','tracks','progress'].forEach((p,i)=>{
+    if(p===id) document.querySelectorAll('nav button')[i].classList.add('active');
+  });
+  if(id==='home')     renderHome();
+  if(id==='drills')   renderDrills();
+  if(id==='tracks')   renderTracks();
+  if(id==='progress') renderProgress();
+}
+
+function getLevel(){
+  let lv=0;
+  for(let i=0;i<LEVELS.length;i++){ if(state.xp>=LEVELS[i].xp) lv=i; }
+  return lv;
+}
+
+function renderHome(){
+  const lv=getLevel(), curr=LEVELS[lv], next=LEVELS[lv+1];
+  document.getElementById('levelTitle').textContent = 'Level '+(lv+1)+' – '+curr.name;
+  document.getElementById('headerXP').textContent = state.xp;
+  if(next){
+    const pct=((state.xp-curr.xp)/(next.xp-curr.xp))*100;
+    document.getElementById('xpBar').style.width = pct+'%';
+    document.getElementById('xpLabel').textContent = state.xp+' XP';
+    document.getElementById('levelSubtitle').textContent = (state.xp-curr.xp)+' / '+(next.xp-curr.xp)+' XP to Level '+(lv+2);
+  } else {
+    document.getElementById('xpBar').style.width = '100%';
+    document.getElementById('levelSubtitle').textContent = 'Max Level Reached 🏆';
+  }
+  document.getElementById('statDrills').textContent = state.drillsDone;
+  document.getElementById('statSessions').textContent = state.sessionsDone;
+  document.getElementById('statStreak').textContent = state.streak;
+  document.getElementById('statMins').textContent = state.minutesTrained;
+  const today=new Date().getDay();
+  const days=['S','M','T','W','T','F','S'];
+  const row=document.getElementById('streakRow');
+  row.innerHTML='';
+  days.forEach(function(d,i){
+    const el=document.createElement('div');
+    el.className='streak-day'+(state.weekDays[i]?' done':'')+(i===today?' today':'');
+    el.textContent=d;
+    row.appendChild(el);
+  });
+}
+
+function setFilter(f,btn){
+  activeFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDrills();
+}
+
+function renderDrills(){
+  const search=(document.getElementById('drillSearch')?document.getElementById('drillSearch').value:'').toLowerCase();
+  const filtered=DRILLS.filter(function(d){
+    const mf=activeFilter==='all'||d.category===activeFilter||d.level===activeFilter;
+    const ms=!search||d.name.toLowerCase().includes(search)||d.desc.toLowerCase().includes(search);
+    return mf&&ms;
+  });
+  document.getElementById('drillCount').textContent=filtered.length;
+  const container=document.getElementById('drill-list');
+  container.innerHTML='';
+  if(!filtered.length){
+    container.innerHTML='<div style="text-align:center;color:var(--muted);padding:30px;">No drills found.</div>';
+    return;
+  }
+  const cats={touch:'🦶 Touch & First Touch',dribble:'⚡ Dribbling & Close Control',cone:'🏁 Cone Work',combo:'💥 Combos & Chains'};
+  const grouped={};
+  filtered.forEach(function(d){ if(!grouped[d.category]) grouped[d.category]=[]; grouped[d.category].push(d); });
+  Object.keys(cats).forEach(function(cat){
+    if(!grouped[cat]) return;
+    const lbl=document.createElement('div');
+    lbl.className='section-label';
+    lbl.textContent=cats[cat];
+    container.appendChild(lbl);
+    grouped[cat].forEach(function(d){
+      const locked=state.xp<d.unlockXP;
+      const prog=state.drillProgress[d.id]||{completions:0};
+      const mastery=Math.min(100,prog.completions*10);
+      const el=document.createElement('div');
+      el.className='drill-card'+(locked?' locked':'');
+      const tagsHtml=d.tags.map(function(t){ return '<span class="badge badge-'+t+'">'+t+'</span>'; }).join('');
+      el.innerHTML=
+        '<div class="drill-header">'+
+          '<div class="drill-name">'+d.icon+' '+d.name+'</div>'+
+          '<div class="drill-badges"><span class="badge badge-'+d.level+'">'+d.level+'</span>'+tagsHtml+'</div>'+
+        '</div>'+
+        '<div class="drill-desc">'+(locked?'🔒 Unlock at '+d.unlockXP+' XP':d.desc)+'</div>'+
+        '<div class="drill-meta">'+
+          '<span>⏱ '+(d.workTime?d.workTime+'s':d.reps+' reps')+'</span>'+
+          '<span>🔁 '+d.sets+' sets</span>'+
+          '<span>⚡ '+d.xp+' XP</span>'+
+          (prog.completions>0?'<span>✅ '+prog.completions+'×</span>':'')+
+        '</div>'+
+        '<div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:'+mastery+'%"></div></div>';
+      if(!locked) el.onclick=(function(drill){ return function(){ openDrillModal(drill); }; })(d);
+      container.appendChild(el);
+    });
+  });
+}
+
+function openDrillModal(d){
+  currentDrill=d;
+  clearInterval(DT.interval); DT.interval=null;
+  document.getElementById('drillStart').style.display='block';
+  document.getElementById('drillRunner').style.display='none';
+  document.getElementById('drillComplete').style.display='none';
+  document.getElementById('modalTitle').textContent=d.icon+' '+d.name;
+  document.getElementById('modalSub').textContent=d.desc;
+  document.getElementById('modalSets').textContent=d.sets;
+  document.getElementById('modalRest').textContent=d.restTime+'s';
+  document.getElementById('modalXP').textContent=d.xp;
+  document.getElementById('coachTip').textContent='💬 '+d.coachTip;
+  const tagsHtml=d.tags.map(function(t){ return '<span class="badge badge-'+t+'">'+t+'</span>'; }).join('');
+  document.getElementById('modalBadges').innerHTML='<span class="badge badge-'+d.level+'">'+d.level+'</span>'+tagsHtml;
+  document.getElementById('modalDiagram').innerHTML=d.diagram?'<div class="cone-diagram">'+d.diagram+'</div>':'';
+  const stepsHtml=d.steps.map(function(s){ return '<li>'+s+'</li>'; }).join('');
+  document.getElementById('modalSteps').innerHTML='<ul class="steps">'+stepsHtml+'</ul>';
+  document.getElementById('drillModal').classList.add('open');
+}
+
+function closeDrillModal(){
+  clearInterval(DT.interval); DT.interval=null;
+  document.getElementById('drillModal').classList.remove('open');
+  currentDrill=null;
+  renderHome(); renderDrills(); renderProgress();
+}
+
+function startDrill(){
+  const d=currentDrill;
+  document.getElementById('drillStart').style.display='none';
+  document.getElementById('drillRunner').style.display='block';
+  DT.set=1; DT.totalSets=d.sets; DT.paused=false; DT.phase='work';
+  buildDots('setsRow',d.sets);
+  runDrillPhase();
+}
+
+function runDrillPhase(){
+  clearInterval(DT.interval); DT.interval=null;
+  const d=currentDrill;
+  if(DT.phase==='work'){
+    document.getElementById('phaseLabel').textContent=
+      d.reps ? 'Set '+DT.set+'/'+DT.totalSets+' · '+d.reps+' reps — tap Skip Set when done'
+              : 'Set '+DT.set+'/'+DT.totalSets+' · Work!';
+    if(d.workTime>0){
+      DT.seconds=d.workTime;
+      paintDrillTimer('work');
+      DT.interval=setInterval(function(){
+        if(DT.paused) return;
+        DT.seconds--;
+        paintDrillTimer('work');
+        if(DT.seconds<=0){
+          clearInterval(DT.interval); DT.interval=null;
+          dotMark('setsRow',DT.set,'done');
+          DT.set++;
+          DT.phase='rest';
+          runDrillPhase();
+        }
+      },1000);
+    } else {
+      document.getElementById('timerDisplay').textContent='●●●';
+      document.getElementById('timerDisplay').className='timer-display';
+    }
+  } else {
+    if(DT.set>DT.totalSets){ finishDrill(); return; }
+    document.getElementById('phaseLabel').textContent='Rest – '+d.restTime+'s';
+    DT.seconds=d.restTime;
+    paintDrillTimer('rest');
+    DT.interval=setInterval(function(){
+      if(DT.paused) return;
+      DT.seconds--;
+      paintDrillTimer('rest');
+      if(DT.seconds<=0){
+        clearInterval(DT.interval); DT.interval=null;
+        dotMark('setsRow',DT.set,'active');
+        DT.phase='work';
+        runDrillPhase();
+      }
+    },1000);
+  }
+}
+
+function paintDrillTimer(phase){
+  const el=document.getElementById('timerDisplay');
+  el.textContent=fmtTime(DT.seconds);
+  el.className='timer-display'+(DT.seconds<=5||phase==='rest'?' warning':'');
+}
+
+function skipSet(){
+  clearInterval(DT.interval); DT.interval=null;
+  if(DT.phase==='work'){ dotMark('setsRow',DT.set,'done'); DT.set++; }
+  if(DT.set>DT.totalSets){ finishDrill(); return; }
+  dotMark('setsRow',DT.set,'active');
+  DT.phase='work';
+  runDrillPhase();
+}
+
+function pauseTimer(){
+  DT.paused=!DT.paused;
+  document.getElementById('btnPause').textContent=DT.paused?'▶ Resume':'⏸ Pause';
+}
+
+function finishDrill(){
+  clearInterval(DT.interval); DT.interval=null;
+  document.getElementById('drillRunner').style.display='none';
+  document.getElementById('drillComplete').style.display='block';
+  recordDrillDone(currentDrill);
+  document.getElementById('completeMsg').textContent='+'+currentDrill.xp+' XP earned! Completion #'+state.drillProgress[currentDrill.id].completions;
+}
+
+function renderTracks(){
+  const container=document.getElementById('track-list');
+  container.innerHTML='';
+  TRACKS.forEach(function(track){
+    const done=track.sessions.filter(function(s){ return state.sessionProgress[s.id]&&state.sessionProgress[s.id].completed; }).length;
+    const pct=Math.round((done/track.sessions.length)*100);
+    const card=document.createElement('div');
+    card.className='track-card';
+    card.style.borderLeft='3px solid '+track.color;
+    let sh='';
+    track.sessions.forEach(function(s,i){
+      const isDone=!!(state.sessionProgress[s.id]&&state.sessionProgress[s.id].completed);
+      const prevDone=i===0||(state.sessionProgress[track.sessions[i-1].id]&&state.sessionProgress[track.sessions[i-1].id].completed);
+      const xpOk=state.xp>=s.unlockXP;
+      const isLocked=!xpOk||!prevDone;
+      const isActive=!isDone&&!isLocked;
+      const nc=isDone?'done':isActive?'active':'';
+      const rc=isDone?'completed':isLocked?'locked':'';
+      const clickAttr=isActive?'onclick="openSessionModal(\''+track.id+'\',\''+s.id+'\')"':'';
+      sh+='<div class="track-session-row '+rc+'" '+clickAttr+'>'+
+            '<div class="track-session-num '+nc+'">'+(isDone?'✓':i+1)+'</div>'+
+            '<div class="track-session-info">'+
+              '<div class="track-session-name">'+s.name+'</div>'+
+              '<div class="track-session-meta">'+(isLocked?'🔒 Complete previous session first':s.desc)+'</div>'+
+            '</div>'+
+            '<div class="track-session-xp">+'+s.xpBonus+' XP</div>'+
+          '</div>';
+    });
+    card.innerHTML=
+      '<div class="track-header"><div class="track-title">'+track.name+'</div><div class="track-progress-label">'+done+'/'+track.sessions.length+' done</div></div>'+
+      '<div style="font-size:0.8rem;color:var(--muted);margin-bottom:10px;">'+track.desc+'</div>'+
+      '<div class="progress-bar-wrap" style="height:5px;margin-bottom:12px;"><div class="progress-bar-fill" style="width:'+pct+'%;background:'+track.color+';"></div></div>'+
+      '<div class="track-sessions">'+sh+'</div>';
+    container.appendChild(card);
+  });
+}
+
+function openSessionModal(trackId,sessionId){
+  const track=TRACKS.find(function(t){ return t.id===trackId; });
+  const sess=track.sessions.find(function(s){ return s.id===sessionId; });
+  currentSession=Object.assign({},sess,{trackId:trackId});
+  sessionDrillIndex=0;
+  document.getElementById('sModalTitle').textContent=sess.name;
+  document.getElementById('sModalSub').textContent=sess.desc;
+  const list=document.getElementById('sModalDrillList');
+  list.innerHTML='<div style="font-size:0.78rem;color:var(--muted);margin-bottom:10px;">Drills in this session:</div>';
+  sess.drills.forEach(function(id,i){
+    const d=DRILLS.find(function(x){ return x.id===id; });
+    if(!d) return;
+    const row=document.createElement('div');
+    row.className='session-drill-card';
+    row.innerHTML=
+      '<div class="sdcard-num">'+(i+1)+'</div>'+
+      '<div class="prog-icon">'+d.icon+'</div>'+
+      '<div class="prog-info">'+
+        '<div class="prog-name">'+d.name+'</div>'+
+        '<div class="prog-detail">'+d.sets+' sets · '+(d.workTime?d.workTime+'s work':d.reps+' reps')+' · '+d.xp+' XP</div>'+
+      '</div>';
+    list.appendChild(row);
+  });
+  document.getElementById('sPreStart').style.display='block';
+  document.getElementById('sRunner').style.display='none';
+  document.getElementById('sComplete').style.display='none';
+  document.getElementById('sessionModal').classList.add('open');
+}
+
+function closeSessionModal(){
+  clearInterval(ST.interval); ST.interval=null; ST.drill=null;
+  document.getElementById('sessionModal').classList.remove('open');
+  currentSession=null;
+  renderHome(); renderTracks(); renderProgress();
+}
+
+function startSession(){
+  document.getElementById('sPreStart').style.display='none';
+  document.getElementById('sRunner').style.display='block';
+  sessionDrillIndex=0;
+  loadNextSessionDrill();
+}
+
+function loadNextSessionDrill(){
+  clearInterval(ST.interval);
+  ST.interval=null;
+  ST.paused=false;
+
+  const s=currentSession;
+  if(!s){ return; }
+  if(sessionDrillIndex>=s.drills.length){ completeSession(); return; }
+
+  const drillId=s.drills[sessionDrillIndex];
+  const d=DRILLS.find(function(x){ return x.id===drillId; });
+
+  if(!d){
+    sessionDrillIndex++;
+    loadNextSessionDrill();
+    return;
+  }
+
+  const pct=Math.round((sessionDrillIndex/s.drills.length)*100);
+  document.getElementById('sStepLabel').textContent='Drill '+(sessionDrillIndex+1)+' of '+s.drills.length;
+  document.getElementById('sStepXP').textContent=d.xp+' XP';
+  document.getElementById('sProgressBar').style.width=pct+'%';
+  document.getElementById('sDrillName').textContent=d.icon+' '+d.name;
+  document.getElementById('sDrillTip').textContent=d.coachTip;
+
+  document.querySelectorAll('.session-drill-card').forEach(function(c,i){
+    c.className='session-drill-card'+(i<sessionDrillIndex?' done-card':i===sessionDrillIndex?' current':'');
+  });
+  document.querySelectorAll('.sdcard-num').forEach(function(n,i){
+    n.className='sdcard-num'+(i<sessionDrillIndex?' done':i===sessionDrillIndex?' current':'');
+  });
+
+  ST.drill=d;
+  ST.set=1;
+  ST.totalSets=d.sets;
+  ST.paused=false;
+  ST.phase='work';
+  ST.seconds=d.workTime>0?d.workTime:0;
+
+  buildDots('sSetsRow',d.sets);
+
+  document.getElementById('sTimerDisplay').textContent=d.workTime>0?fmtTime(d.workTime):'●●●';
+  document.getElementById('sTimerDisplay').className='timer-display';
+  document.getElementById('sPhaseLabel').textContent=d.reps
+    ? d.reps+' reps × '+d.sets+' sets · tap ▶ Start Set when ready'
+    : d.workTime+'s work · '+d.restTime+'s rest · '+d.sets+' sets';
+
+  document.getElementById('sBtnStart').style.display='inline-block';
+  document.getElementById('sBtnPause').style.display='none';
+  document.getElementById('sBtnPause').textContent='⏸ Pause';
+}
+
+function sessionStartSet(){
+  ST.paused=false;
+  document.getElementById('sBtnStart').style.display='none';
+  document.getElementById('sBtnPause').style.display='inline-block';
+  document.getElementById('sBtnPause').textContent='⏸ Pause';
+  runSessionPhase();
+}
+
+function runSessionPhase(){
+  clearInterval(ST.interval); ST.interval=null;
+  const d=ST.drill;
+  if(!d) return;
+
+  if(ST.phase==='work'){
+    document.getElementById('sPhaseLabel').textContent=d.reps
+      ? 'Set '+ST.set+'/'+ST.totalSets+' · '+d.reps+' reps — tap Next Drill when done'
+      : 'Set '+ST.set+'/'+ST.totalSets+' · Work!';
+    if(d.workTime>0){
+      ST.seconds=d.workTime;
+      paintSTimer('work');
+      ST.interval=setInterval(function(){
+        if(ST.paused) return;
+        ST.seconds--;
+        paintSTimer('work');
+        if(ST.seconds<=0){
+          clearInterval(ST.interval); ST.interval=null;
+          dotMark('sSetsRow',ST.set,'done');
+          ST.set++;
+          ST.phase='rest';
+          runSessionPhase();
+        }
+      },1000);
+    } else {
+      document.getElementById('sTimerDisplay').textContent='●●●';
+      document.getElementById('sTimerDisplay').className='timer-display';
+    }
+  } else {
+    if(ST.set>ST.totalSets){
+      const drillJustDone=ST.drill;
+      ST.drill=null;
+      recordDrillDone(drillJustDone);
+      sessionDrillIndex++;
+      loadNextSessionDrill();
+      return;
+    }
+    document.getElementById('sPhaseLabel').textContent='Rest – '+d.restTime+'s';
+    ST.seconds=d.restTime;
+    paintSTimer('rest');
+    ST.interval=setInterval(function(){
+      if(ST.paused) return;
+      ST.seconds--;
+      paintSTimer('rest');
+      if(ST.seconds<=0){
+        clearInterval(ST.interval); ST.interval=null;
+        dotMark('sSetsRow',ST.set,'active');
+        document.getElementById('sPhaseLabel').textContent='Set '+ST.set+'/'+ST.totalSets+' ready — tap ▶ Start Set';
+        document.getElementById('sBtnStart').style.display='inline-block';
+        document.getElementById('sBtnPause').style.display='none';
+        document.getElementById('sBtnPause').textContent='⏸ Pause';
+        ST.phase='work';
+      }
+    },1000);
+  }
+}
+
+function paintSTimer(phase){
+  const el=document.getElementById('sTimerDisplay');
+  el.textContent=fmtTime(ST.seconds);
+  el.className='timer-display'+(ST.seconds<=5||phase==='rest'?' warning':'');
+}
+
+function sessionPause(){
+  ST.paused=!ST.paused;
+  const btn=document.getElementById('sBtnPause');
+  btn.textContent=ST.paused?'▶ Resume':'⏸ Pause';
+}
+
+function sessionNextDrill(){
+  clearInterval(ST.interval);
+  ST.interval=null;
+  ST.paused=false;
+
+  const drillToRecord=ST.drill;
+  ST.drill=null;
+
+  if(drillToRecord) recordDrillDone(drillToRecord);
+
+  sessionDrillIndex++;
+  setTimeout(loadNextSessionDrill,50);
+}
+
+function completeSession(){
+  clearInterval(ST.interval); ST.interval=null;
+  const s=currentSession;
+  awardXP(s.xpBonus);
+  state.sessionsDone++;
+  state.minutesTrained+=s.totalTime;
+  if(!state.sessionProgress[s.id]) state.sessionProgress[s.id]={};
+  state.sessionProgress[s.id].completed=true;
+  markTodayDone();
+  state.activityLog.push('🏆 '+s.name+' · +'+s.xpBonus+' XP · '+new Date().toLocaleDateString());
+  save();
+  document.getElementById('sRunner').style.display='none';
+  document.getElementById('sComplete').style.display='block';
+  document.getElementById('sProgressBar').style.width='100%';
+  document.getElementById('sCompleteMsg').textContent='+'+s.xpBonus+' bonus XP earned! Total sessions: '+state.sessionsDone;
+}
+
+function renderProgress(){
+  const list=document.getElementById('masteryList');
+  list.innerHTML='';
+  DRILLS.forEach(function(d){
+    const prog=state.drillProgress[d.id]||{completions:0,xpEarned:0};
+    const mastery=Math.min(100,prog.completions*10);
+    const el=document.createElement('div');
+    el.className='prog-item';
+    el.innerHTML=
+      '<div class="prog-icon">'+d.icon+'</div>'+
+      '<div class="prog-info">'+
+        '<div class="prog-name">'+d.name+'</div>'+
+        '<div class="prog-detail">'+prog.completions+' completions · '+mastery+'% mastery</div>'+
+        '<div class="progress-bar-wrap" style="margin-top:3px;"><div class="progress-bar-fill" style="width:'+mastery+'%"></div></div>'+
+      '</div>'+
+      '<div class="prog-xp">+'+(prog.xpEarned||0)+'</div>';
+    list.appendChild(el);
+  });
+  const logEl=document.getElementById('activityLog');
+  if(!state.activityLog.length){ logEl.textContent='No activity yet.'; return; }
+  logEl.innerHTML=state.activityLog.slice(-20).reverse().map(function(a){
+    return '<div style="padding:5px 0;border-bottom:1px solid var(--border);">'+a+'</div>';
+  }).join('');
+}
+
+function fmtTime(s){
+  const m=Math.floor(s/60).toString().padStart(2,'0');
+  const sc=(s%60).toString().padStart(2,'0');
+  return m+':'+sc;
+}
+
+function buildDots(rowId,total){
+  const row=document.getElementById(rowId);
+  row.innerHTML='';
+  for(let i=1;i<=total;i++){
+    const dot=document.createElement('div');
+    dot.className='set-dot'+(i===1?' active':'');
+    dot.id=rowId+'_'+i;
+    dot.textContent=i;
+    row.appendChild(dot);
+  }
+}
+
+function dotMark(rowId,n,cls){
+  const el=document.getElementById(rowId+'_'+n);
+  if(el) el.className='set-dot '+cls;
+}
+
+function awardXP(amount){
+  state.xp+=amount;
+  document.getElementById('headerXP').textContent=state.xp;
+  save();
+}
+
+function recordDrillDone(d){
+  if(!d) return;
+  if(!state.drillProgress[d.id]) state.drillProgress[d.id]={completions:0,xpEarned:0};
+  state.drillProgress[d.id].completions++;
+  state.drillProgress[d.id].xpEarned+=d.xp;
+  state.drillsDone++;
+  awardXP(d.xp);
+  markTodayDone();
+  state.minutesTrained+=Math.round((d.sets*(d.workTime||45)+d.sets*d.restTime)/60);
+  state.activityLog.push('✅ '+d.icon+' '+d.name+' · +'+d.xp+' XP · '+new Date().toLocaleDateString());
+  save();
+}
+
+function markTodayDone(){
+  const today=new Date().getDay();
+  if(!state.weekDays[today]){ state.weekDays[today]=true; state.streak++; save(); }
+}
+
+function quickStart(){
+  const available=DRILLS.filter(function(d){ return state.xp>=d.unlockXP; });
+  const fresh=available.filter(function(d){ return !(state.drillProgress[d.id]&&state.drillProgress[d.id].completions>0); });
+  const pool=fresh.length?fresh:available;
+  const pick=pool[Math.floor(Math.random()*pool.length)];
+  showPage('drills');
+  setTimeout(function(){ openDrillModal(pick); },100);
+}
+
+load();
+renderHome();
+renderDrills();
+renderTracks();
+renderProgress();
+</script>
+</body>
+</html>
+
+							<script>
+                            	
+							</script>
+                        </body>
+                        </html>
+                    
