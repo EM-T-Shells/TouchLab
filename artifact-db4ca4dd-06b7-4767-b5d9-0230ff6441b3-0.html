@@ -1,0 +1,829 @@
+
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<style>
+								body {
+									background-color: white; /* Ensure the iframe has a white background */
+								}
+
+								
+							</style>
+                        </head>
+                        <body>
+                            <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Solo Soccer Drill Library</title>
+<style>
+  :root {
+    --green: #1a7a3c;
+    --green-light: #23a455;
+    --green-dark: #0f4d25;
+    --accent: #f0c040;
+    --bg: #f4f7f4;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --muted: #6b7280;
+    --red: #dc2626;
+    --blue: #2563eb;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* NAV */
+  nav {
+    background: var(--green-dark);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .nav-logo { font-size: 1.15rem; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+  .nav-logo span { font-size: 1.4rem; }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    background: none; border: none; color: rgba(255,255,255,0.7);
+    padding: 8px 14px; border-radius: 8px; cursor: pointer;
+    font-size: 0.88rem; font-weight: 600; transition: all 0.2s;
+  }
+  .nav-tab:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .nav-tab.active { background: var(--green-light); color: #fff; }
+
+  /* PAGES */
+  .page { display: none; padding: 20px 16px; max-width: 800px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* TODAY */
+  .today-header { margin-bottom: 20px; }
+  .today-header h1 { font-size: 1.5rem; color: var(--green-dark); }
+  .today-header p { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+  .session-meta {
+    background: var(--green-dark); color: #fff;
+    border-radius: var(--radius); padding: 14px 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px;
+  }
+  .session-meta .meta-item { text-align: center; }
+  .session-meta .meta-val { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+  .session-meta .meta-lbl { font-size: 0.75rem; opacity: 0.8; margin-top: 2px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 18px; border-radius: 8px; border: none;
+    cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.18s;
+  }
+  .btn-primary { background: var(--green-light); color: #fff; }
+  .btn-primary:hover { background: var(--green); }
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-danger:hover { background: #b91c1c; }
+  .btn-secondary { background: #e5e7eb; color: var(--text); }
+  .btn-secondary:hover { background: #d1d5db; }
+  .btn-accent { background: var(--accent); color: #1a1a1a; }
+  .btn-accent:hover { background: #d4a800; }
+  .regenerate-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+
+  /* DRILL CARD */
+  .drill-card {
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); margin-bottom: 14px;
+    overflow: hidden; transition: box-shadow 0.2s;
+  }
+  .drill-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.12); }
+  .drill-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px 10px;
+    cursor: pointer;
+  }
+  .drill-card-left { flex: 1; }
+  .drill-card-title { font-size: 1rem; font-weight: 700; color: var(--green-dark); }
+  .drill-card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px; }
+  .tag {
+    font-size: 0.7rem; font-weight: 600; padding: 2px 8px;
+    border-radius: 999px; background: #e8f5ee; color: var(--green-dark);
+  }
+  .tag.difficulty-intermediate { background: #fef3c7; color: #92400e; }
+  .tag.difficulty-advanced { background: #fee2e2; color: #991b1b; }
+  .tag.difficulty-beginner { background: #dbeafe; color: #1e40af; }
+  .drill-card-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .drill-duration { font-size: 0.85rem; font-weight: 700; color: var(--green-light); background: #e8f5ee; padding: 4px 10px; border-radius: 999px; }
+  .vote-btn {
+    background: none; border: 1px solid #e5e7eb; border-radius: 8px;
+    width: 34px; height: 34px; cursor: pointer; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .vote-btn:hover { border-color: var(--green-light); background: #e8f5ee; }
+  .vote-btn.liked { background: #dcfce7; border-color: var(--green-light); }
+  .vote-btn.disliked { background: #fee2e2; border-color: var(--red); }
+  .chevron { font-size: 0.8rem; color: var(--muted); transition: transform 0.2s; }
+  .drill-card.open .chevron { transform: rotate(180deg); }
+  .drill-card-body {
+    display: none; padding: 0 16px 16px;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 12px;
+  }
+  .drill-card.open .drill-card-body { display: block; }
+  .drill-card-body p { font-size: 0.9rem; color: var(--text); line-height: 1.6; margin-bottom: 8px; }
+  .drill-card-body .setup { font-size: 0.85rem; color: var(--muted); font-style: italic; }
+  .drill-card-body .coaching { font-size: 0.85rem; color: var(--blue); margin-top: 8px; }
+
+  /* TIMER */
+  .timer-bar-wrap { background: #e8f5ee; border-radius: 999px; height: 6px; margin: 10px 0 0; overflow: hidden; }
+  .timer-bar { height: 6px; background: var(--green-light); border-radius: 999px; transition: width 1s linear; }
+  .timer-display { font-size: 0.8rem; color: var(--muted); margin-top: 4px; text-align: right; }
+
+  /* LIBRARY */
+  .library-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+  .library-header h1 { font-size: 1.4rem; color: var(--green-dark); }
+  .search-row { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .search-input {
+    flex: 1; min-width: 200px; padding: 9px 14px; border-radius: 8px;
+    border: 1.5px solid #e5e7eb; font-size: 0.9rem; outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--green-light); }
+  .filter-select {
+    padding: 9px 12px; border-radius: 8px; border: 1.5px solid #e5e7eb;
+    font-size: 0.88rem; background: #fff; cursor: pointer; outline: none;
+  }
+  .filter-select:focus { border-color: var(--green-light); }
+  .drill-count { font-size: 0.85rem; color: var(--muted); margin-bottom: 12px; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 200;
+    align-items: center; justify-content: center;
+    padding: 16px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff; border-radius: var(--radius); width: 100%; max-width: 520px;
+    max-height: 90vh; overflow-y: auto; padding: 24px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+  }
+  .modal h2 { font-size: 1.2rem; color: var(--green-dark); margin-bottom: 18px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%; padding: 9px 12px; border-radius: 8px;
+    border: 1.5px solid #e5e7eb; font-size: 0.9rem; font-family: inherit;
+    outline: none; transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--green-light); }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-row { display: flex; gap: 10px; }
+  .form-row .form-group { flex: 1; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--green-dark); color: #fff;
+    padding: 10px 22px; border-radius: 8px; font-size: 0.9rem; font-weight: 600;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 300;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .nav-logo .logo-text { display: none; }
+    .nav-tab { padding: 8px 10px; font-size: 0.82rem; }
+    .session-meta { gap: 8px; }
+    .session-meta .meta-val { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo"><span>⚽</span> <span class="logo-text">Solo Drills</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('today')">Today</button>
+    <button class="nav-tab" onclick="showPage('library')">Library</button>
+  </div>
+</nav>
+
+<div id="page-today" class="page active">
+  <div class="today-header">
+    <h1 id="today-date"></h1>
+    <p>Your daily solo training session</p>
+  </div>
+  <div class="session-meta">
+    <div class="meta-item"><div class="meta-val" id="meta-drills">—</div><div class="meta-lbl">Drills</div></div>
+    <div class="meta-item"><div class="meta-val" id="meta-time">—</div><div class="meta-lbl">Minutes</div></div>
+    <div class="meta-item"><div class="meta-val" id="meta-focus">—</div><div class="meta-lbl">Focus</div></div>
+  </div>
+  <div class="regenerate-row">
+    <button class="btn btn-accent" onclick="regenerateSession()">🔀 New Session</button>
+    <button class="btn btn-secondary" onclick="startAllTimers()">▶ Start Session</button>
+  </div>
+  <div id="today-drills"></div>
+</div>
+
+<div id="page-library" class="page">
+  <div class="library-header">
+    <h1>Drill Library <span id="lib-count-badge" style="font-size:0.9rem;color:var(--muted);font-weight:400;"></span></h1>
+    <button class="btn btn-primary" onclick="openAddModal()">+ Add Drill</button>
+  </div>
+  <div class="search-row">
+    <input class="search-input" id="lib-search" placeholder="Search drills…" oninput="renderLibrary()" />
+    <select class="filter-select" id="lib-filter-cat" onchange="renderLibrary()">
+      <option value="">All Categories</option>
+    </select>
+    <select class="filter-select" id="lib-filter-diff" onchange="renderLibrary()">
+      <option value="">All Levels</option>
+      <option value="beginner">Beginner</option>
+      <option value="intermediate">Intermediate</option>
+      <option value="advanced">Advanced</option>
+    </select>
+  </div>
+  <div class="drill-count" id="lib-drill-count"></div>
+  <div id="library-drills"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="drill-modal">
+  <div class="modal">
+    <h2 id="modal-title">Add Drill</h2>
+    <div class="form-group">
+      <label>Drill Name *</label>
+      <input id="f-name" placeholder="e.g. L-Shaped Cone Weave" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Category *</label>
+        <select id="f-cat">
+          <option value="Ball Mastery">Ball Mastery</option>
+          <option value="Cone Dribbling">Cone Dribbling</option>
+          <option value="Agility & Speed">Agility & Speed</option>
+          <option value="Change of Direction">Change of Direction</option>
+          <option value="1v0 Moves">1v0 Moves</option>
+          <option value="First Touch">First Touch</option>
+          <option value="Footwork">Footwork</option>
+          <option value="Acceleration">Acceleration</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Difficulty *</label>
+        <select id="f-diff">
+          <option value="beginner">Beginner</option>
+          <option value="intermediate" selected>Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Duration (min) *</label>
+        <input id="f-dur" type="number" min="1" max="10" value="2" />
+      </div>
+      <div class="form-group">
+        <label>Reps / Sets</label>
+        <input id="f-reps" placeholder="e.g. 3×30s" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Description *</label>
+      <textarea id="f-desc" placeholder="Describe how to perform the drill…"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Setup (cones, space needed)</label>
+      <input id="f-setup" placeholder="e.g. 6 cones in a straight line, 1m apart" />
+    </div>
+    <div class="form-group">
+      <label>Coaching Cue</label>
+      <input id="f-cue" placeholder="e.g. Keep head up, use both feet equally" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDrill()">Save Drill</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────
+// DRILL DATABASE (105 drills)
+// ─────────────────────────────────────────────
+const DEFAULT_DRILLS = [
+  // BALL MASTERY
+  { id:'d001', name:'Sole Roll Slalom', cat:'Ball Mastery', diff:'intermediate', dur:2, reps:'4×30s each foot', desc:'Set 6 cones in a straight line 1m apart. Dribble through using only the sole of your foot to roll the ball around each cone, alternating feet. Keep the ball close and low.', setup:'6 cones in a line, 1m apart', cue:'Lean slightly over the ball, lock your ankle' },
+  { id:'d002', name:'Inside-Outside Weave', cat:'Ball Mastery', diff:'intermediate', dur:2, reps:'5 runs', desc:'Weave through 8 cones using strictly inside-outside touch pattern on one foot. Go down using left foot only, return using right foot only. Increase speed each run.', setup:'8 cones in a line, 1m apart', cue:'Small, quick touches — ball never more than 30cm away' },
+  { id:'d003', name:'Maradona 360 Series', cat:'Ball Mastery', diff:'advanced', dur:2, reps:'3×5 reps each side', desc:'Place a single cone. Approach at pace, plant your foot on the ball, drag it behind you with the sole while pivoting 360°, then explode away in a new direction. Chain 5 consecutive Maradonas around the cone.', setup:'1 cone', cue:'Stay on the balls of your feet through the entire rotation' },
+  { id:'d004', name:'V-Cut Rapid Fire', cat:'Ball Mastery', diff:'intermediate', dur:2, reps:'3×45s', desc:'Stand over the ball. Perform rapid V-cuts: push ball forward with the outside of one foot, then drag it back diagonally with the sole, alternating feet. Aim for speed and sharp angle changes.', setup:'Open space, 1 ball', cue:'Arms out for balance, stay low' },
+  { id:'d005', name:'Box Touch Pattern', cat:'Ball Mastery', diff:'intermediate', dur:2, reps:'4×30s', desc:'Place 4 cones in a 2m×2m box. Touch the ball to each corner of the box using a set pattern: inside right, inside left, outside right, outside left. Rotate the sequence each set.', setup:'4 cones in 2m×2m square', cue:'Head up every third touch' },
+  { id:'d006', name:'Sole Roll Figure-8', cat:'Ball Mastery', diff:'intermediate', dur:2, reps:'4×20 reps', desc:'Two cones 2m apart. Roll the ball in a figure-8 pattern around both cones using only the sole of each foot. Keep the pattern tight and controlled.', setup:'2 cones, 2m apart', cue:'Control the roll speed with your arch, not your toes' },
+  { id:'d007', name:'Tick-Tock Pendulum', cat:'Ball Mastery', diff:'intermediate', dur:2, reps:'3×40s', desc:'Ball stationary. Swing it side to side using inside of left foot then inside of right foot in a pendulum motion. Gradually increase speed while keeping the ball between your feet.', setup:'Open space', cue:'Stay square to the ball, small weight shifts' },
+  { id:'d008', name:'Around-the-World Cone', cat:'Ball Mastery', diff:'advanced', dur:2, reps:'3×10 circuits', desc:'Place a single cone. Circle the ball all the way around the cone using alternating foot touches, keeping the ball within 15cm of the cone. Complete 10 full circles one direction, then reverse.', setup:'1 cone', cue:'Short, precise touches — never more than one foot away' },
+  { id:'d009', name:'Scissor Overload', cat:'Ball Mastery', diff:'advanced', dur:2, reps:'4×30s', desc:'Move forward slowly doing continuous scissors: step over the ball with one foot, immediately step over with the other, then push the ball forward one touch and repeat. Focus on explosive step-over speed, not forward movement.', setup:'Open space', cue:'Land on the balls of your feet after each step-over' },
+  { id:'d010', name:'Double Touch Rolls', cat:'Ball Mastery', diff:'intermediate', dur:2, reps:'3×30s', desc:'Two-touch pattern: roll ball forward with sole, then stop it dead with sole of opposite foot. Alternate continuously. Then progress to doing this while slowly moving forward between cones.', setup:'4 cones in a line, 2m apart', cue:'Soft touch on the stop, firm on the roll' },
+
+  // CONE DRIBBLING
+  { id:'d011', name:'Slalom Sprint', cat:'Cone Dribbling', diff:'intermediate', dur:2, reps:'6 runs', desc:'10 cones in a straight line, 1m apart. Weave through at maximum speed with tight touches. Walk back for rest between runs. Time yourself and try to beat it each run.', setup:'10 cones in line, 1m apart', cue:'Use outside of foot on fast runs, lean into each gate' },
+  { id:'d012', name:'Slalom With Moves', cat:'Cone Dribbling', diff:'advanced', dur:2, reps:'4 runs', desc:'Same 10-cone slalom but perform a different skill move at every other cone: scissors, step-over, Cruyff, fake shot. The move must be done before continuing the weave.', setup:'10 cones in line, 1m apart', cue:'Plant your weight before the move, explode out' },
+  { id:'d013', name:'T-Drill Dribble', cat:'Cone Dribbling', diff:'intermediate', dur:2, reps:'5 reps', desc:'Set cones in a T shape: 1 at start, 1 at 9m, then 1 at 4.5m left and 1 at 4.5m right of center. Dribble to the top of the T, shuffle left with ball, shuffle right across to far cone, shuffle back to center, backpedal dribbling to start.', setup:'4 cones in T shape', cue:'Low center of gravity on lateral moves' },
+  { id:'d014', name:'Diamond Dribble', cat:'Cone Dribbling', diff:'intermediate', dur:2, reps:'5 circuits', desc:'4 cones forming a diamond, 3m per side. Dribble full circuits, performing a specific cut at each cone: inside cut at top, outside cut at right, step-over at bottom, Cruyff at left.', setup:'4 cones in diamond, 3m apart', cue:'Explode out of each move with 2-3 hard touches' },
+  { id:'d015', name:'Zigzag Speed Dribble', cat:'Cone Dribbling', diff:'intermediate', dur:2, reps:'6 runs', desc:'8 cones set in two parallel lines 2m apart, offset to create a zigzag path. Dribble through the zigzag as fast as possible, cutting sharply at each cone.', setup:'8 cones in 2 offset lines, 2m apart', cue:'Weight on outside foot when cutting inward' },
+  { id:'d016', name:'Star Pattern Dribble', cat:'Cone Dribbling', diff:'advanced', dur:2, reps:'4 circuits each direction', desc:'5 cones in a star (pentagon) shape, 3m apart. Dribble from center to each outer cone and back, performing a specific cut at each outer cone. Rotate the pattern direction each circuit.', setup:'1 center cone + 5 outer cones in pentagon, 3m out', cue:'Cut with purpose — change of pace out of every turn' },
+  { id:'d017', name:'Figure-8 Acceleration', cat:'Cone Dribbling', diff:'intermediate', dur:2, reps:'6 reps each direction', desc:'Two cones 5m apart. Dribble a tight figure-8 around both. On the straight between cones, accelerate explosively for 3-4 quick touches. On the curve, slow and tighten control.', setup:'2 cones, 5m apart', cue:'Burst out of each cone with first heavy touch to gain ground' },
+  { id:'d018', name:'L-Shape Cone Run', cat:'Cone Dribbling', diff:'intermediate', dur:2, reps:'5 reps each direction', desc:'Set cones in an L: 4 cones along one side (1m apart), 4 cones turning 90° (1m apart). Dribble through, executing a sharp cut at the corner. Return weaving the outer edge.', setup:'7 cones in L shape, 1m apart', cue:'Drop your hip before the corner to sell the change of direction' },
+  { id:'d019', name:'Random Cone Sprint', cat:'Cone Dribbling', diff:'advanced', dur:2, reps:'10 reps', desc:'Scatter 8 cones randomly in a 5m×5m grid. Dribble to each cone in random order, touching the cone with your foot before moving to the next. Go as fast as possible.', setup:'8 cones scattered in 5×5m area', cue:'Scan ahead — decide your next cone before you reach the current one' },
+  { id:'d020', name:'Speed Gate Dribble', cat:'Cone Dribbling', diff:'intermediate', dur:2, reps:'6 runs', desc:'Set 5 pairs of cones as gates (1m wide each), spaced 3m apart in a straight line. Sprint-dribble through each gate. Gate 3 requires a specific move (e.g., step-over) before continuing.', setup:'10 cones in 5 pairs, 3m apart, 1m wide', cue:'Decelerate one step before the gate, accelerate through' },
+
+  // AGILITY & SPEED
+  { id:'d021', name:'Cone Touch Agility', cat:'Agility & Speed', diff:'intermediate', dur:2, reps:'4×30s', desc:'3 cones in a line, 2m apart. Sprint to touch the first with your hand while the ball stays at start, sprint back, sprint to second, back, sprint to third, back — then take one touch to pass through all cones dribbling. This forces quick directional change.', setup:'3 cones in line, 2m apart', cue:'Low heel contact when touching cones, never cross your feet' },
+  { id:'d022', name:'5-10-5 Dribble', cat:'Agility & Speed', diff:'advanced', dur:2, reps:'6 reps', desc:'Classic 5-10-5 shuttle but with the ball. From center cone, sprint-dribble 5m left, cut back 10m right, cut back 5m to center. Use inside cut for direction changes. Time each rep.', setup:'3 cones: center + 5m left + 5m right', cue:'Plant outside foot hard on direction change, push off that foot' },
+  { id:'d023', name:'Box Acceleration Sprint', cat:'Agility & Speed', diff:'intermediate', dur:2, reps:'5 circuits', desc:'4 cones in a 6m×6m box. Dribble at speed around the perimeter, varying the pace: jog the first side, accelerate the second, decelerate (tight control) the third, sprint the fourth.', setup:'4 cones in 6×6m box', cue:'Use multiple different surfaces on different sides of the box' },
+  { id:'d024', name:'Reactive Cone Sprint', cat:'Agility & Speed', diff:'advanced', dur:2, reps:'10 reps', desc:'Place 4 cones 3m from your feet in N/S/E/W positions. Stand in the center with ball. Call out (or look down at a numbered sheet and react) a cone number, sprint-dribble to that cone, perform a drag-back, and return to center.', setup:'4 cones, 3m away in 4 directions', cue:'First touch away from the cone on return — not straight back' },
+  { id:'d025', name:'Ladder-Style Cone Footwork', cat:'Agility & Speed', diff:'intermediate', dur:2, reps:'4 passes each direction', desc:'6 cones placed 50cm apart in a line. Without the ball first, move through: two-feet-in each gap, lateral shuffle through, in-in-out-out pattern. Then repeat with the ball at your feet for each pattern.', setup:'6 cones in line, 50cm apart', cue:'Balls of feet only — no flat-footed steps' },
+  { id:'d026', name:'Acceleration Lane', cat:'Agility & Speed', diff:'intermediate', dur:2, reps:'6 reps', desc:'3 cones: start, 10m marker, 20m marker. Start dribbling slowly, reach 10m cone and explode to 20m at maximum sprint with the ball. Walk back to start for recovery. Focus on the first 3 explosive touches after 10m.', setup:'3 cones: 0m, 10m, 20m in a line', cue:'Drive knee up on explosion, first touch should be 1m ahead' },
+  { id:'d027', name:'Deceleration Control', cat:'Agility & Speed', diff:'intermediate', dur:2, reps:'6 reps', desc:'Sprint dribble at full speed for 15m, then stop the ball completely dead within 2 steps when you reach the end cone. Practice bringing it to a complete controlled stop without overrunning.', setup:'2 cones, 15m apart', cue:'Step over the ball slightly, sole tap to kill momentum' },
+  { id:'d028', name:'Reactive Direction Change', cat:'Agility & Speed', diff:'advanced', dur:2, reps:'3×45s', desc:'Dribble freely in a 5m×5m box. Every time you approach a cone boundary, perform a sharp cut inward before you reach it. Practice feeling the boundary in your peripheral vision without fully looking down.', setup:'4 cones in 5×5m box', cue:'Head up, use peripheral vision for boundary awareness' },
+
+  // CHANGE OF DIRECTION
+  { id:'d029', name:'Cruyff Turn Sequence', cat:'Change of Direction', diff:'intermediate', dur:2, reps:'4×8 reps each side', desc:'Cone at 10m. Dribble toward it at a medium pace. At the cone, execute a Cruyff turn: fake to kick, hook ball behind standing leg, exit on a new angle. Alternate sides. Sprint back and repeat.', setup:'1 cone, 10m from start', cue:'Sell the fake pass — fully commit the upper body' },
+  { id:'d030', name:'Drag-Back Sprint', cat:'Change of Direction', diff:'intermediate', dur:2, reps:'4×6 reps', desc:'Sprint-dribble 8m toward a cone. At the cone, perform a drag-back (sole roll backward). Immediately accelerate in the direction you came from. Focus on quick pivot and explosive first step out.', setup:'1 cone, 8m away', cue:'Stay low after the drag-back, dont stand tall before accelerating' },
+  { id:'d031', name:'Inside Cut Drill', cat:'Change of Direction', diff:'intermediate', dur:2, reps:'3×10 reps', desc:'Dribble at a cone and perform a sharp inside cut (Matthews cut) just before reaching it. Alternate the direction of each cut: left-left-right-right. Keep the touch tight and explosive.', setup:'1 cone', cue:'Lean in opposite direction of the cut to deceive' },
+  { id:'d032', name:'Outside Cut Sequence', cat:'Change of Direction', diff:'intermediate', dur:2, reps:'3×10 reps', desc:'Approach a cone at controlled pace and execute a sharp outside-of-foot cut before it, angling the ball 45° to the side. Alternate feet. Progress to full sprint approach.', setup:'1 cone', cue:'Ankle locked, toe pointed down for a clean outside touch' },
+  { id:'d033', name:'180° Turn Series', cat:'Change of Direction', diff:'intermediate', dur:2, reps:'3×8 reps each foot', desc:'Sprint 10m, perform a sole-roll 180° turn, sprint back. Alternate the foot used for the turn. Perform in sets: 3 on left, 3 on right. Focus on no extra touches — one clean pivot.', setup:'2 cones, 10m apart', cue:'Chop steps before the turn to set your weight properly' },
+  { id:'d034', name:'Step-Over Cut Combo', cat:'Change of Direction', diff:'advanced', dur:2, reps:'3×8 reps each side', desc:'Approach a cone, perform 2 quick step-overs over the ball, then execute a sharp inside cut the opposite direction you faked. Explode out with 3 quick touches and decelerate, then repeat.', setup:'1 cone', cue:'Speed of step-overs matters — slow fakes dont work' },
+  { id:'d035', name:'Cone Clock Cuts', cat:'Change of Direction', diff:'advanced', dur:2, reps:'4×30s', desc:'4 cones placed at 12, 3, 6, and 9 o\'clock positions, 3m from center. Start at center. Sprint to each cone in order, perform a specific cut (inside, outside, Cruyff, drag-back), return to center, move to next. Rotate.', setup:'4 cones in + shape, 3m from center', cue:'Change of pace on every return to center — dont coast' },
+  { id:'d036', name:'Double Cone Cut', cat:'Change of Direction', diff:'intermediate', dur:2, reps:'4×6 reps', desc:'Two cones 3m apart. Sprint to first, inside cut left around it. Sprint to second, inside cut right around it. Drag-back back through the middle. Repeat going right-left. This builds multi-cut combination habits.', setup:'2 cones, 3m apart', cue:'Stay tight to each cone — 10cm clearance maximum' },
+  { id:'d037', name:'Zig-Zag Inside Cuts', cat:'Change of Direction', diff:'intermediate', dur:2, reps:'5 full runs', desc:'6 cones in a zigzag pattern (2m per gap, offset 2m laterally). Approach each cone and execute only inside cuts to navigate the pattern. No outside foot allowed.', setup:'6 cones in zigzag, 2m apart', cue:'Cut from the hip — full body commitment to direction change' },
+
+  // 1v0 MOVES
+  { id:'d038', name:'Elastico Reps', cat:'1v0 Moves', diff:'advanced', dur:2, reps:'3×10 each foot', desc:'Ball stationary against a cone. Practice the elastico: push ball outward with outside of foot, then immediately flick it inward with the inside of the same foot in one fluid wrist-snap motion. 10 reps each foot.', setup:'1 cone', cue:'The inward snap must be faster than the outward push' },
+  { id:'d039', name:'Heel-Toe Flick', cat:'1v0 Moves', diff:'advanced', dur:2, reps:'3×8 reps', desc:'Dribble slowly forward, then execute the heel-toe flick: step heel over ball, flick it forward or sideways using the instep of the same foot. Maintain forward momentum. Repeat in continuous motion.', setup:'Open space', cue:'Commit fully — a half-hearted heel-toe doesnt beat anyone' },
+  { id:'d040', name:'Rabona Touch Series', cat:'1v0 Moves', diff:'advanced', dur:2, reps:'3×6 reps each side', desc:'Stationary then slow dribble. Cross dominant leg behind standing leg and touch ball outward with the crossed foot instep. Recover quickly and control the redirected ball. Progress to doing this during a slow run.', setup:'Open space', cue:'Weight all on standing leg — crossed leg is a pendulum' },
+  { id:'d041', name:'Ronaldo Chop', cat:'1v0 Moves', diff:'advanced', dur:2, reps:'3×10 reps each side', desc:'Dribble at medium pace. Plant standing foot, swing kicking foot across the ball as if crossing, then chop it sharply sideways with the outside of that foot on the follow-through. Accelerate after.', setup:'Open space, 10m run-up', cue:'Shoulders must sell the fake cross before the chop' },
+  { id:'d042', name:'Roulette (Zidane Turn)', cat:'1v0 Moves', diff:'advanced', dur:2, reps:'3×8 reps each direction', desc:'Receive the ball (or set it still), place sole on ball and roll forward, use heel of same foot to flick it behind, pivot 360° and step onto the rolling ball with the other foot. Exit at pace.', setup:'Open space', cue:'The pivot and second touch must be one fluid motion' },
+  { id:'d043', name:'Akka Move', cat:'1v0 Moves', diff:'advanced', dur:2, reps:'3×8 reps each side', desc:'One foot taps the ball outward, the same foot sweeps around the outside to flick it back inward past an imaginary opponent. Practice stationary first, then slowly walking forward.', setup:'Open space', cue:'Keep hips open — this move dies if you square up' },
+  { id:'d044', name:'Hocus Pocus', cat:'1v0 Moves', diff:'advanced', dur:2, reps:'3×6 reps each side', desc:'Roll ball backward with one foot over it, then flick it forward with the heel of that same foot, all in one motion while the body spins. Set up with a slow dribble, perform the move, then explode away.', setup:'Open space', cue:'Eye on the ball through the entire rotation' },
+  { id:'d045', name:'Double Scissors to Cut', cat:'1v0 Moves', diff:'advanced', dur:2, reps:'3×8 sequences', desc:'Two full step-overs (right, left) over a stationary ball, followed by a sharp inside cut with the right foot. Then two step-overs (left, right) and inside cut with the left foot. Speed is key.', setup:'Open space', cue:'Each step-over must land before the next starts — no air time overlap' },
+  { id:'d046', name:'Stop-and-Go Feint', cat:'1v0 Moves', diff:'intermediate', dur:2, reps:'4×6 reps', desc:'Sprint forward dribbling, stop the ball dead with the sole, pause for one beat, then explode forward again as if the "defender" committed to your stop. Repeat, varying stop duration between 1-3 seconds.', setup:'10m open space', cue:'The pause sells the move — make it deliberate' },
+  { id:'d047', name:'Body Feint Dribble', cat:'1v0 Moves', diff:'intermediate', dur:2, reps:'3×10 reps each side', desc:'Dribble slowly forward. Dip shoulder hard to one side (selling a direction change), then cut ball sharply in the opposite direction. Exaggerate the shoulder drop to build muscle memory.', setup:'Open space', cue:'Eyes up, shoulder drop starts the sequence' },
+  { id:'d048', name:'Fake Shot Turn', cat:'1v0 Moves', diff:'intermediate', dur:2, reps:'3×8 reps each side', desc:'Dribble toward a cone, wind up as if shooting, but instead plant your shooting foot behind the ball and drag it back with the sole in the same motion. Exit at 90° and accelerate.', setup:'1 cone', cue:'Selling the shot requires full commitment of the kicking leg' },
+
+  // FIRST TOUCH
+  { id:'d049', name:'Lofted Toss Trap', cat:'First Touch', diff:'intermediate', dur:2, reps:'4×10 reps each foot', desc:'Toss ball into the air 2-3m above you. Bring it down with a soft inside-of-foot trap. Practice landing the ball in a perfect cushioned touch so it settles 50cm in front of you, ready to play.', setup:'Open space', cue:'Meet the ball early, withdraw your foot on contact' },
+  { id:'d050', name:'Thigh Trap to Volley', cat:'First Touch', diff:'intermediate', dur:2, reps:'3×10 reps', desc:'Throw ball up, trap it on your thigh, let it drop, and cushion it to your feet with the instep. Maintain a fluid rhythm. Increase height of throw each set.', setup:'Open space', cue:'Thigh should be horizontal at contact — dont let it angle down' },
+  { id:'d051', name:'Chest-to-Foot Sequence', cat:'First Touch', diff:'intermediate', dur:2, reps:'3×8 reps', desc:'Throw ball upward, chest it gently forward, then take a first touch with your foot before it hits the ground again. Focus on chest kill touch + quick ground control.', setup:'Open space', cue:'Puff chest out on contact, let it act like a cushion' },
+  { id:'d052', name:'Self-Toss Inside Trap Drill', cat:'First Touch', diff:'intermediate', dur:2, reps:'3×12 reps each foot', desc:'Throw ball to the side slightly ahead of you, run onto it, and cushion it with the inside of your foot while already moving. Simulate receiving while running — dont stop to trap.', setup:'Open space, 5m runs', cue:'Dont wait for the ball — run into it and move simultaneously' },
+  { id:'d053', name:'Juggle-to-Dribble Transition', cat:'First Touch', diff:'intermediate', dur:2, reps:'4×30s', desc:'Juggle 5 touches, then intentionally drop the last touch ahead of you and immediately transition into a dribble through a gate (2 cones). Repeat. Vary which foot initiates the dribble.', setup:'2 cones as a gate, 2m wide', cue:'The drop-touch should be forward — dont place it under your feet' },
+  { id:'d054', name:'Directional First Touch', cat:'First Touch', diff:'advanced', dur:2, reps:'3×10 reps each direction', desc:'Place 2 cones: one on your left and one on your right, 5m away. Toss ball up from standing, then first-touch it (inside or outside of foot) toward one of the cones, and sprint to collect. Alternate cones.', setup:'2 cones, 5m apart, player in middle', cue:'Pick the direction before the ball lands — commit early' },
+  { id:'d055', name:'Outside-Foot Trap Series', cat:'First Touch', diff:'advanced', dur:2, reps:'3×10 reps each foot', desc:'Toss ball up at various angles. Consistently bring it down using only the outside of one foot, settling it perfectly in your stride path. This is a skill most players underuse.', setup:'Open space', cue:'Turn your toe inward to form a shelf with the outside of the foot' },
+
+  // FOOTWORK
+  { id:'d056', name:'Rapid Toe Taps', cat:'Footwork', diff:'intermediate', dur:2, reps:'4×30s', desc:'Ball stationary. Rapidly alternate tapping the top of the ball with the sole of each foot. Stay on your toes. Aim for maximum speed while maintaining contact quality — dont let the ball drift.', setup:'Open space', cue:'Elbows bent, arms pumping for rhythm' },
+  { id:'d057', name:'Inside-Inside Pull-Back', cat:'Footwork', diff:'intermediate', dur:2, reps:'3×40s', desc:'Two cones 4m apart. Touch ball inside-right to travel right, inside-left to stop it and redirect left, inside-right to stop, redirect right. This is a fast-paced side-to-side inside-foot exercise.', setup:'2 cones, 4m apart', cue:'Gentle touches — let the ball do the work' },
+  { id:'d058', name:'Cruyff-to-Sole Roll Combo', cat:'Footwork', diff:'advanced', dur:2, reps:'3×8 reps each side', desc:'Approach a cone, Cruyff the ball behind you, immediately sole roll it across your body in the new direction, and sprint out. Combo the two moves in one fluid sequence.', setup:'1 cone', cue:'No hesitation between Cruyff and sole roll — flow directly into it' },
+  { id:'d059', name:'Scissors Footwork Burst', cat:'Footwork', diff:'intermediate', dur:2, reps:'4×20 reps', desc:'Standing stationary, perform fast scissors: right foot steps over, lands, left foot steps over, lands. Do 10 fast continuous scissors, then take 1 sharp cut and sprint 5m. Repeat.', setup:'Open space', cue:'Low center of gravity, minimal up-down movement' },
+  { id:'d060', name:'Fake-Pass Pivot Run', cat:'Footwork', diff:'intermediate', dur:2, reps:'4×6 reps', desc:'Dribble at a cone. Perform a fake pass (wind up, plant, dont kick), pivot off the plant foot in the opposite direction, pull ball with sole and sprint. Explosive pivot footwork.', setup:'1 cone', cue:'Plant foot should point toward the fake-pass target' },
+  { id:'d061', name:'Outside-Foot Dribble Sprint', cat:'Footwork', diff:'intermediate', dur:2, reps:'6 runs', desc:'Two cones 15m apart. Dribble the entire length using ONLY the outside of one foot. Return using the outside of the other. Increase speed each run. Great for developing weaker outside touch.', setup:'2 cones, 15m apart', cue:'Angled toe contact, not the laces — outside edge of shoe only' },
+  { id:'d062', name:'Weak-Foot Slalom', cat:'Footwork', diff:'intermediate', dur:2, reps:'4 runs', desc:'Standard 8-cone slalom but entirely with your non-dominant foot. Slow first for quality, then build speed. Force every touch to be made with the weak foot.', setup:'8 cones in line, 1m apart', cue:'Quality over speed on the first 2 runs — speed is a byproduct of good touches' },
+  { id:'d063', name:'Instep Touch Series', cat:'Footwork', diff:'intermediate', dur:2, reps:'3×30s each foot', desc:'Juggle continuously using only the instep of one foot. Let the ball bounce between touches (semi-juggle / continuous instep touch). 30s right foot, 30s left foot. Focus on consistent height and touch quality.', setup:'Open space', cue:'Toes pointed down for a flat surface, dont flip toe up' },
+
+  // ACCELERATION
+  { id:'d064', name:'Burst-and-Cut Sprint', cat:'Acceleration', diff:'intermediate', dur:2, reps:'6 reps', desc:'Start at a standing still position. Explode forward dribbling for 10m at maximum speed. Decelerate to a stop with a drag-back, then immediately burst 5m in a 90° direction. Walk back, repeat.', setup:'3 cones in an L, 10m + 5m', cue:'First touch must be 80cm ahead — start the sprint before the ball lands' },
+  { id:'d065', name:'3-Touch Acceleration', cat:'Acceleration', diff:'intermediate', dur:2, reps:'6 reps', desc:'From still, take exactly 3 explosive forward touches to cover 10m, then stop the ball dead. The 3 touches must get progressively further — this is not a sprint but a burst-and-brake.', setup:'2 cones, 10m apart', cue:'Touch 1: short (30cm), Touch 2: medium (50cm), Touch 3: long (1m)' },
+  { id:'d066', name:'Cone Sprint Intervals', cat:'Acceleration', diff:'advanced', dur:2, reps:'8 reps', desc:'Two cones 20m apart. Sprint dribble to the far cone at 100% effort. Jog back slowly as recovery. Every rep should be maximum intensity. This builds acceleration with ball under fatigue.', setup:'2 cones, 20m apart', cue:'Run through the cone — dont decelerate before it' },
+  { id:'d067', name:'Dead Stop Explosion', cat:'Acceleration', diff:'advanced', dur:2, reps:'8 reps', desc:'Stand completely still with ball at feet. On a self-given signal (clap, or a timer), explode forward as fast as possible for 7m. This drills first-step quickness specifically with the ball.', setup:'1 cone, 7m away', cue:'First touch is the most important — make it assertive and forward' },
+  { id:'d068', name:'Acceleration-Deceleration Sequence', cat:'Acceleration', diff:'advanced', dur:2, reps:'4 sequences', desc:'4 cones at 5m, 10m, 15m, 20m. Sprint to 5m, decelerate to a control touch, sprint to 10m, decelerate, sprint to 15m, decelerate, sprint to 20m. Each deceleration must fully kill your pace before the next sprint.', setup:'4 cones at 5m intervals', cue:'Chop steps to decelerate — 2-3 quick short strides before each control touch' },
+  { id:'d069', name:'Turn-and-Burst Drill', cat:'Acceleration', diff:'advanced', dur:2, reps:'6 reps each direction', desc:'Dribble backward slowly (backpedal dribble) to a cone 5m behind you. Touch the cone with your heel, instantly spin 180° and burst sprint forward 10m at full speed with the ball.', setup:'3 cones: start, 5m back, 10m front', cue:'Spin tight — wide turns kill your acceleration angle' },
+
+  // MORE BALL MASTERY ADVANCED
+  { id:'d070', name:'Ball Roll Box Drill', cat:'Ball Mastery', diff:'intermediate', dur:2, reps:'4×30s', desc:'4 cones in a 3m×3m box. Sole roll the ball from cone to cone along the inside perimeter of the box, alternating feet. Keep the rolls tight to the cone lines.', setup:'4 cones in 3×3m box', cue:'Use the inside arch for direction, sole for the roll' },
+  { id:'d071', name:'Lunge Dribble', cat:'Ball Mastery', diff:'intermediate', dur:2, reps:'3×20m', desc:'Dribble forward with an exaggerated lunge step on each touch — a long stride that stretches your touch distance. This builds confidence with the ball stretched far from your body.', setup:'Open space, 20m', cue:'Maintain full control at lunge extension — dont lose the ball' },
+  { id:'d072', name:'Weak Foot Circles', cat:'Ball Mastery', diff:'intermediate', dur:2, reps:'4×30s', desc:'Place a single cone. Using ONLY your weak foot, perform continuous tight circles around the cone keeping the ball within 20cm of it. First clockwise, then counterclockwise.', setup:'1 cone', cue:'Don't rush — accuracy builds before speed does' },
+  { id:'d073', name:'Rainbow Flick Practice', cat:'Ball Mastery', diff:'advanced', dur:2, reps:'3×8 reps', desc:'Roll the ball onto the back of your dominant foot and flick it over your head using a heel-to-heel motion. Practice stationary first, then try while walking slowly forward. This move is for flair but also builds body coordination.', setup:'Open space', cue:'Roll the ball up with your stronger foot before the flick' },
+  { id:'d074', name:'No-Look Touch Pattern', cat:'Ball Mastery', diff:'advanced', dur:2, reps:'3×30s', desc:'Perform standard inside-outside-sole touch patterns but with your eyes focused on a point 5m ahead — never look at the ball. This forces proprioceptive ball control.', setup:'Open space', cue:'Trust your touch — looking at the ball is a crutch' },
+  { id:'d075', name:'Juggle to Chest to Dribble', cat:'Ball Mastery', diff:'intermediate', dur:2, reps:'3×8 sequences', desc:'Juggle 3 times, chest kill the ball, take first touch forward into a 10m dribble sprint, come back. Each sequence should be fluid with no extra touches.', setup:'Open space, 10m run', cue:'The chest touch is a directional pass to yourself' },
+
+  // MORE AGILITY
+  { id:'d076', name:'Lateral Shuffle Dribble', cat:'Agility & Speed', diff:'intermediate', dur:2, reps:'4×20m', desc:'Shuffle sideways (never cross your feet) while keeping the ball moving laterally with inside touches. 10m left, 10m right. Stay low and keep the ball in front of your hip.', setup:'Open space, 10m each direction', cue:'Wide stance, bend in your knees the whole time' },
+  { id:'d077', name:'Agility Cone Series', cat:'Agility & Speed', diff:'advanced', dur:2, reps:'4 circuits', desc:'Set 8 cones in a winding circuit 1.5m apart. Dribble the course as fast as possible. On the way back, perform a predetermined skill move at every cone. Timed — try to beat your time.', setup:'8 cones in a winding course', cue:'Stay compact between cones — dont overstride' },
+  { id:'d078', name:'Sprint-Stop-Sprint', cat:'Agility & Speed', diff:'intermediate', dur:2, reps:'6 reps', desc:'Sprint full speed dribbling for 8m, stop ball dead (sole trap), pause 1 second, sprint full speed again for 8m. No loss of control at stop. This trains instant deceleration and re-acceleration.', setup:'3 cones: 0m, 8m, 16m', cue:'Sole on top of ball to stop — dont use your toe' },
+  { id:'d079', name:'360 Cone Weave', cat:'Agility & Speed', diff:'advanced', dur:2, reps:'4 runs', desc:'8 cones in a line. At EVERY cone, perform a full 360° spin (Maradona) around the cone before continuing to the next. This maximizes change-of-direction work while building move execution under fatigue.', setup:'8 cones in a line, 1.5m apart', cue:'Keep the ball in front of you during the spin, not behind' },
+
+  // MORE COD
+  { id:'d080', name:'Escape Cut Drill', cat:'Change of Direction', diff:'advanced', dur:2, reps:'3×8 reps', desc:'Sprint toward a cone at full speed. At the cone, perform an escape cut: last step inside of foot cuts ball sharply 90° sideways, and you burst in that new direction for 5m. Reset.', setup:'1 cone, with 5m exit space on each side', cue:'Last step before cut should be a wide plant to shift momentum' },
+  { id:'d081', name:'Dribble Direction Box', cat:'Change of Direction', diff:'intermediate', dur:2, reps:'4×45s', desc:'Dribble inside a 4m×4m box. Every time you approach a wall (cone), you MUST change direction using a different move each time: inside cut, outside cut, drag-back, step-over. No repeating a move at consecutive cones.', setup:'4 cones in 4×4m box', cue:'Be unpredictable — your cuts should surprise yourself' },
+  { id:'d082', name:'Cone-Touch Reversals', cat:'Change of Direction', diff:'intermediate', dur:2, reps:'5×6 reps', desc:'Sprint to a cone 10m away, touch it with your foot, perform a drag-back, sprint to a second cone 10m away, touch it, drag-back, return. One continuous back-and-forth.', setup:'2 cones, 10m apart', cue:'Dont round the corner — cut sharp at each cone' },
+
+  // MORE MOVES
+  { id:'d083', name:'McGeady Spin Series', cat:'1v0 Moves', diff:'advanced', dur:2, reps:'3×8 reps each side', desc:'Slow dribble toward a cone. Use the outside of the foot to push ball forward, then step over and spin off on the inside of the same foot. Exit at full speed. This is a rapid spin with no ball stoppage.', setup:'1 cone', cue:'Dont stop the ball — the spin is a continuous sweeping motion' },
+  { id:'d084', name:'Neymar Inside Flick', cat:'1v0 Moves', diff:'advanced', dur:2, reps:'3×8 each side', desc:'Slow dribble, outside touch pushes ball slightly past imaginary defender, then snap the inside of the same foot sharply to flick it behind the line of your body. Exit on the other side.', setup:'Open space', cue:'The snap must be quick — slow flicks get caught' },
+  { id:'d085', name:'Wrist Feint Series', cat:'1v0 Moves', diff:'intermediate', dur:2, reps:'4×8 reps each side', desc:'Slow dribble. Flick both wrists sharply to one side as if winding up for a cross or shot. Plant your foot and cut the ball sharply the other direction. Upper body and lower body deception.', setup:'Open space', cue:'Wrist flick and shoulder drop together create a compound deception' },
+  { id:'d086', name:'Stepover to Heel Pass', cat:'1v0 Moves', diff:'advanced', dur:2, reps:'3×6 reps each side', desc:'Perform one step-over, then immediately backflick the ball with the heel of the non-step-over foot, so the ball exits behind you. Turn 180° and chase it. Practice as a move to switch play past an imaginary press.', setup:'Open space', cue:'Heel contact must be firm and directional — angle your heel' },
+
+  // MORE FOOTWORK
+  { id:'d087', name:'Cone-to-Cone Weak Foot', cat:'Footwork', diff:'intermediate', dur:2, reps:'6 runs', desc:'Two cones 15m apart. Dribble between them using ONLY your weak foot in every scenario: inside, outside, sole. No strong foot touches allowed. Slow for quality, then build speed.', setup:'2 cones, 15m apart', cue:'Persevere through the discomfort — this is where real improvement lives' },
+  { id:'d088', name:'Rapid Direction Tap Drill', cat:'Footwork', diff:'advanced', dur:2, reps:'3×45s', desc:'Ball stationary. Rapidly tap ball left with right inside, tap right with left inside, tap forward with right outside, pull back with left sole. Sequence: L-R-F-B. Max speed, no loss of ball.', setup:'Open space', cue:'Keep the sequence memorized so your brain isnt the bottleneck' },
+  { id:'d089', name:'Continuous Heel Flick Dribble', cat:'Footwork', diff:'advanced', dur:2, reps:'3×20m', desc:'Dribble forward using only heel flicks — flick ball forward with the back of your heel and chase it. Progress to alternating heels. This is not efficient soccer but is excellent for touch development.', setup:'Open space, 20m', cue:'Short quick heel taps keep the ball close' },
+  { id:'d090', name:'Triangle Cone Touch Drill', cat:'Footwork', diff:'intermediate', dur:2, reps:'4×30s each direction', desc:'3 cones in a triangle, 2m per side. Move ball around the triangle perimeter using inside-foot touches only, staying in contact with the ball continuously. 30s clockwise, 30s counter-clockwise.', setup:'3 cones in triangle, 2m apart', cue:'Shuffle your feet — dont plant and reach' },
+
+  // MORE ACCELERATION
+  { id:'d091', name:'5m Burst Reps', cat:'Acceleration', diff:'intermediate', dur:2, reps:'10 reps', desc:'Stand over the ball. Burst as fast as possible to a cone 5m away with the ball. Walk back. Complete 10 reps. Focus entirely on the first two touches out of the stationary position.', setup:'1 cone, 5m away', cue:'Hip extension drives the first push — dont stand up straight immediately' },
+  { id:'d092', name:'Change-Speed Dribble', cat:'Acceleration', diff:'intermediate', dur:2, reps:'4×40m runs', desc:'40m of open space. Walk the ball for 5m, jog for 5m, accelerate to 70% for 10m, drop to 30% for 5m, sprint full out for 10m, slow back to walk for 5m. Speed variation builds real-match control.', setup:'Open space, 40m', cue:'Ball control quality must not drop when speed drops' },
+  { id:'d093', name:'Turn-Sprint Combo', cat:'Acceleration', diff:'advanced', dur:2, reps:'5 sequences', desc:'Start at center of 3 cones (each 7m out at 120° angles). Dribble to cone 1, Cruyff turn, sprint to cone 2, drag-back, sprint to cone 3, inside cut, sprint back to center. Each sprint is full pace.', setup:'3 cones in triangle, 7m from center', cue:'Each sprint segment should be maximum effort — this is conditioning too' },
+
+  // UNIQUE / CREATIVE
+  { id:'d094', name:'Juggle Circuit', cat:'Ball Mastery', diff:'intermediate', dur:2, reps:'4×60s', desc:'Juggle continuously while walking between 4 cones set 5m apart in a box. If the ball drops, pick it up and restart from the nearest cone. Goal: complete the full box circuit without dropping.', setup:'4 cones in 5m box', cue:'Use thigh juggles as resets if you lose rhythm' },
+  { id:'d095', name:'High-Intensity Ball Mastery', cat:'Ball Mastery', diff:'advanced', dur:2, reps:'4×30s with 15s rest', desc:'Sprint 5m, stop with sole, perform 4 rapid toe taps, sole roll left, sprint 5m back, stop with sole, 4 toe taps, sole roll right. This combines conditioning with mastery.', setup:'2 cones, 5m apart', cue:'Every touch counts — sloppy rest touches breed bad habits' },
+  { id:'d096', name:'Cone Hop Dribble', cat:'Agility & Speed', diff:'intermediate', dur:2, reps:'4×20m', desc:'Alternate between physically hopping over a low cone (with both feet, no ball) and taking a control touch to keep the ball nearby. Hop, take a touch, hop, take a touch. Builds reactive footwork.', setup:'5 low/flat cones, 2m apart', cue:'Land softly — absorb impact through your knee bend' },
+  { id:'d097', name:'Shadow Dribble', cat:'1v0 Moves', diff:'intermediate', dur:2, reps:'3×60s', desc:'Create a 5m×5m box. Dribble freely within it doing any moves you want, but move continuously with purpose — never jog straight for more than 2 touches. Simulate moving with the ball in a tight space with pressure.', setup:'4 cones in 5×5m box', cue:'Think of an imaginary defender always 1m behind you' },
+  { id:'d098', name:'Alternating Speed Slalom', cat:'Cone Dribbling', diff:'advanced', dur:2, reps:'4 runs', desc:'10 cones in a line. Alternate between maximum sprint speed on odd gaps and slow deliberate control on even gaps. This mimics real game rhythm — no drill should be one constant speed.', setup:'10 cones in line, 1.5m apart', cue:'Slow sections should feel almost uncomfortably slow — true deceleration' },
+  { id:'d099', name:'Weak Foot Sole Roll Circuit', cat:'Footwork', diff:'intermediate', dur:2, reps:'3×40s', desc:'4 cones in a box 3m×3m. Using ONLY your weak foot sole, roll the ball from cone to cone around the box perimeter. Both clockwise and counterclockwise.', setup:'4 cones in 3×3m box', cue:'Dont rush — a perfect slow roll beats a sloppy fast roll every time' },
+  { id:'d100', name:'Ball Between Feet Sprints', cat:'Agility & Speed', diff:'advanced', dur:2, reps:'5 reps', desc:'Balance ball between your feet, leap forward 1m, control ball, leap forward again — essentially a bounding control drill. For the last 5m of each rep, drop into a full sprint dribble.', setup:'Open space, 10m', cue:'Catch the ball with a soft landing — compression on first contact' },
+  { id:'d101', name:'Quick Feet Cone Tap Bursts', cat:'Agility & Speed', diff:'intermediate', dur:2, reps:'4×20s', desc:'Place ball 1m from a cone. Quick-tap ball to cone and back (inside-foot only) as many times as possible in 20 seconds. Count your taps and try to beat each set.', setup:'1 cone, 1m from ball', cue:'Stay square, dont reach — let your feet catch up to the ball' },
+  { id:'d102', name:'Outside Foot Figure-8', cat:'Ball Mastery', diff:'advanced', dur:2, reps:'3×8 circuits each direction', desc:'Two cones 2m apart. Dribble a figure-8 around both using ONLY the outside of each foot. Right foot handles right cone, left foot handles left cone. Very precise, demanding touch.', setup:'2 cones, 2m apart', cue:'Stay on your toes, lead with your hip to position the outside foot' },
+  { id:'d103', name:'Stop-Step-Explode', cat:'Change of Direction', diff:'advanced', dur:2, reps:'4×8 reps', desc:'Dribble at pace, stop ball with sole, perform one step-over over the stationary ball, then cut it sharply with the opposite inside foot. The step-over adds deception to a straight stop.', setup:'Open space', cue:'The step-over must happen immediately after the sole stop' },
+  { id:'d104', name:'Pressure Dribble Box', cat:'1v0 Moves', diff:'advanced', dur:2, reps:'4×45s', desc:'Dribble in a 4m×4m box with no ball allowed to touch a cone. Perform moves continuously: step-overs, scissors, Cruyff, inside/outside cuts. Goal is continuous creative movement under self-imposed pressure.', setup:'4 cones in 4×4m box', cue:'Variety is the goal — never do the same move twice in a row' },
+  { id:'d105', name:'Full Foot Inventory Drill', cat:'Ball Mastery', diff:'intermediate', dur:2, reps:'2×60s', desc:'Dribble 20m using every surface in sequence: 3 touches inside right, 3 outside right, 3 sole right, 3 inside left, 3 outside left, 3 sole left. Rotate. Every surface of both feet must be used equally.', setup:'Open space, 20m', cue:'This drill exposes your weakest surfaces — note and address them' },
+];
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let drills = [];
+let session = [];
+let votes = {};
+let editingId = null;
+let activeTimers = {};
+
+function loadState() {
+  try { drills = JSON.parse(localStorage.getItem('ssd_drills')) || []; } catch { drills = []; }
+  if (!drills.length) { drills = JSON.parse(JSON.stringify(DEFAULT_DRILLS)); saveDrills(); }
+  try { votes = JSON.parse(localStorage.getItem('ssd_votes')) || {}; } catch { votes = {}; }
+}
+function saveDrills() { localStorage.setItem('ssd_drills', JSON.stringify(drills)); }
+function saveVotes() { localStorage.setItem('ssd_votes', JSON.stringify(votes)); }
+
+// ─────────────────────────────────────────────
+// SESSION GENERATION
+// ─────────────────────────────────────────────
+function getTodayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+function getWeight(drill) {
+  const v = votes[drill.id] || 0;
+  if (v >= 3) return 0.2;
+  if (v === 2) return 0.5;
+  if (v === 1) return 0.75;
+  if (v === -1) return 1.4;
+  if (v === -2) return 1.8;
+  if (v <= -3) return 2.5;
+  return 1.0;
+}
+function weightedShuffle(arr) {
+  const scored = arr.map(d => ({ d, score: Math.random() * getWeight(d) }));
+  return scored.sort((a, b) => b.score - a.score).map(x => x.d);
+}
+function generateSession(forceNew = false) {
+  const key = getTodayKey();
+  const storedKey = localStorage.getItem('ssd_session_date');
+  const storedSession = localStorage.getItem('ssd_session');
+  if (!forceNew && storedKey === key && storedSession) {
+    try { session = JSON.parse(storedSession); return; } catch {}
+  }
+  const pool = weightedShuffle([...drills]);
+  session = [];
+  let total = 0;
+  const target = 17; // aim for 17 minutes
+  for (const d of pool) {
+    if (total + d.dur <= 20) { session.push(d); total += d.dur; }
+    if (total >= 15) break;
+  }
+  localStorage.setItem('ssd_session_date', key);
+  localStorage.setItem('ssd_session', JSON.stringify(session));
+}
+function regenerateSession() {
+  stopAllTimers();
+  generateSession(true);
+  renderSession();
+  showToast('New session generated!');
+}
+
+// ─────────────────────────────────────────────
+// RENDER SESSION
+// ─────────────────────────────────────────────
+function renderSession() {
+  const container = document.getElementById('today-drills');
+  const totalMins = session.reduce((s, d) => s + d.dur, 0);
+  document.getElementById('meta-drills').textContent = session.length;
+  document.getElementById('meta-time').textContent = totalMins;
+  const cats = [...new Set(session.map(d => d.cat))];
+  document.getElementById('meta-focus').textContent = cats.length <= 2 ? cats.join('+') : cats.length + ' Areas';
+  const today = new Date();
+  document.getElementById('today-date').textContent = today.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+
+  if (!session.length) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>No drills available. Add some in the Library!</p></div>';
+    return;
+  }
+  container.innerHTML = session.map((d, i) => renderDrillCard(d, i, 'session')).join('');
+}
+
+function renderDrillCard(d, i, context) {
+  const v = votes[d.id] || 0;
+  const liked = v > 0 ? 'liked' : '';
+  const disliked = v < 0 ? 'disliked' : '';
+  return `
+  <div class="drill-card" id="card-${context}-${i}">
+    <div class="drill-card-header" onclick="toggleCard('${context}',${i})">
+      <div class="drill-card-left">
+        <div class="drill-card-title">${d.name}</div>
+        <div class="drill-card-tags">
+          <span class="tag">${d.cat}</span>
+          <span class="tag difficulty-${d.diff}">${capitalize(d.diff)}</span>
+          ${d.reps ? `<span class="tag">${d.reps}</span>` : ''}
+        </div>
+      </div>
+      <div class="drill-card-right">
+        <span class="drill-duration">${d.dur} min</span>
+        <button class="vote-btn ${liked}" onclick="event.stopPropagation();vote('${d.id}',1,'${context}',${i})" title="More of this">👍</button>
+        <button class="vote-btn ${disliked}" onclick="event.stopPropagation();vote('${d.id}',-1,'${context}',${i})" title="Less of this">👎</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="drill-card-body">
+      <p>${d.desc}</p>
+      ${d.setup ? `<p class="setup">🔧 Setup: ${d.setup}</p>` : ''}
+      ${d.cue ? `<p class="coaching">💡 ${d.cue}</p>` : ''}
+      <div class="timer-bar-wrap"><div class="timer-bar" id="tbar-${context}-${i}" style="width:0%"></div></div>
+      <div class="timer-display" id="tdisplay-${context}-${i}">${d.dur * 60}s remaining</div>
+    </div>
+  </div>`;
+}
+
+function toggleCard(context, i) {
+  const card = document.getElementById(`card-${context}-${i}`);
+  card.classList.toggle('open');
+}
+
+// ─────────────────────────────────────────────
+// VOTE
+// ─────────────────────────────────────────────
+function vote(id, dir, context, i) {
+  const current = votes[id] || 0;
+  votes[id] = Math.max(-5, Math.min(5, current + dir));
+  saveVotes();
+  const v = votes[id];
+  const card = document.getElementById(`card-${context}-${i}`);
+  if (!card) return;
+  const likeBtn = card.querySelectorAll('.vote-btn')[0];
+  const dislikeBtn = card.querySelectorAll('.vote-btn')[1];
+  likeBtn.className = 'vote-btn' + (v > 0 ? ' liked' : '');
+  dislikeBtn.className = 'vote-btn' + (v < 0 ? ' disliked' : '');
+  showToast(dir > 0 ? '👍 You\'ll see this more often' : '👎 You\'ll see this less often');
+}
+
+// ─────────────────────────────────────────────
+// TIMERS
+// ─────────────────────────────────────────────
+function startAllTimers() {
+  stopAllTimers();
+  session.forEach((d, i) => {
+    const delay = session.slice(0, i).reduce((s, x) => s + x.dur * 60, 0);
+    const totalSecs = d.dur * 60;
+    const card = document.getElementById(`card-session-${i}`);
+    const bar = document.getElementById(`tbar-session-${i}`);
+    const display = document.getElementById(`tdisplay-session-${i}`);
+    let elapsed = 0;
+    const t = setInterval(() => {
+      elapsed++;
+      if (elapsed >= totalSecs) {
+        clearInterval(t);
+        if (bar) bar.style.width = '100%';
+        if (display) display.textContent = 'Done ✓';
+        return;
+      }
+      const pct = (elapsed / totalSecs) * 100;
+      if (bar) bar.style.width = pct + '%';
+      if (display) display.textContent = `${totalSecs - elapsed}s remaining`;
+      if (card && !card.classList.contains('open')) card.classList.add('open');
+    }, 1000);
+    activeTimers[`session-${i}`] = t;
+    // open card when its turn arrives
+    if (delay > 0) {
+      const openTimer = setTimeout(() => {
+        if (card) { card.classList.add('open'); card.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      }, delay * 1000);
+      activeTimers[`open-${i}`] = openTimer;
+    } else if (i === 0 && card) { card.classList.add('open'); }
+  });
+  showToast('▶ Session started! Timers running.');
+}
+function stopAllTimers() {
+  Object.values(activeTimers).forEach(t => { clearInterval(t); clearTimeout(t); });
+  activeTimers = {};
+}
+
+// ─────────────────────────────────────────────
+// LIBRARY
+// ─────────────────────────────────────────────
+function renderLibrary() {
+  const search = document.getElementById('lib-search').value.toLowerCase();
+  const cat = document.getElementById('lib-filter-cat').value;
+  const diff = document.getElementById('lib-filter-diff').value;
+  let filtered = drills.filter(d => {
+    const matchSearch = !search || d.name.toLowerCase().includes(search) || d.desc.toLowerCase().includes(search) || d.cat.toLowerCase().includes(search);
+    const matchCat = !cat || d.cat === cat;
+    const matchDiff = !diff || d.diff === diff;
+    return matchSearch && matchCat && matchDiff;
+  });
+  document.getElementById('lib-drill-count').textContent = `Showing ${filtered.length} of ${drills.length} drills`;
+  document.getElementById('lib-count-badge').textContent = `(${drills.length})`;
+  const container = document.getElementById('library-drills');
+  if (!filtered.length) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><p>No drills match your search.</p></div>';
+    return;
+  }
+  container.innerHTML = filtered.map((d, i) => renderLibraryCard(d, i)).join('');
+}
+
+function renderLibraryCard(d, i) {
+  const v = votes[d.id] || 0;
+  const liked = v > 0 ? 'liked' : '';
+  const disliked = v < 0 ? 'disliked' : '';
+  return `
+  <div class="drill-card" id="libcard-${i}">
+    <div class="drill-card-header" onclick="toggleCard('lib',${i}); this.closest('.drill-card').id='libcard-${i}'">
+      <div class="drill-card-left">
+        <div class="drill-card-title">${d.name}</div>
+        <div class="drill-card-tags">
+          <span class="tag">${d.cat}</span>
+          <span class="tag difficulty-${d.diff}">${capitalize(d.diff)}</span>
+          ${d.reps ? `<span class="tag">${d.reps}</span>` : ''}
+        </div>
+      </div>
+      <div class="drill-card-right">
+        <span class="drill-duration">${d.dur} min</span>
+        <button class="vote-btn ${liked}" onclick="event.stopPropagation();vote('${d.id}',1,'lib',${i})" title="More of this">👍</button>
+        <button class="vote-btn ${disliked}" onclick="event.stopPropagation();vote('${d.id}',-1,'lib',${i})" title="Less of this">👎</button>
+        <button class="btn btn-secondary" style="padding:4px 10px;font-size:0.8rem;" onclick="event.stopPropagation();openEditModal('${d.id}')">✏️</button>
+        <button class="btn btn-danger" style="padding:4px 10px;font-size:0.8rem;" onclick="event.stopPropagation();deleteDrill('${d.id}')">🗑</button>
+        <span class="chevron">▼</span>
+      </div>
+    </div>
+    <div class="drill-card-body">
+      <p>${d.desc}</p>
+      ${d.setup ? `<p class="setup">🔧 Setup: ${d.setup}</p>` : ''}
+      ${d.cue ? `<p class="coaching">💡 ${d.cue}</p>` : ''}
+    </div>
+  </div>`;
+}
+
+function populateCategoryFilter() {
+  const cats = [...new Set(drills.map(d => d.cat))].sort();
+  const sel = document.getElementById('lib-filter-cat');
+  sel.innerHTML = '<option value="">All Categories</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+}
+
+// ─────────────────────────────────────────────
+// MODAL ADD / EDIT
+// ─────────────────────────────────────────────
+function openAddModal() {
+  editingId = null;
+  document.getElementById('modal-title').textContent = 'Add Drill';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-cat').value = 'Ball Mastery';
+  document.getElementById('f-diff').value = 'intermediate';
+  document.getElementById('f-dur').value = '2';
+  document.getElementById('f-reps').value = '';
+  document.getElementById('f-desc').value = '';
+  document.getElementById('f-setup').value = '';
+  document.getElementById('f-cue').value = '';
+  document.getElementById('drill-modal').classList.add('open');
+}
+function openEditModal(id) {
+  const d = drills.find(x => x.id === id);
+  if (!d) return;
+  editingId = id;
+  document.getElementById('modal-title').textContent = 'Edit Drill';
+  document.getElementById('f-name').value = d.name;
+  document.getElementById('f-cat').value = d.cat;
+  document.getElementById('f-diff').value = d.diff;
+  document.getElementById('f-dur').value = d.dur;
+  document.getElementById('f-reps').value = d.reps || '';
+  document.getElementById('f-desc').value = d.desc;
+  document.getElementById('f-setup').value = d.setup || '';
+  document.getElementById('f-cue').value = d.cue || '';
+  document.getElementById('drill-modal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('drill-modal').classList.remove('open');
+}
+function saveDrill() {
+  const name = document.getElementById('f-name').value.trim();
+  const desc = document.getElementById('f-desc').value.trim();
+  if (!name || !desc) { showToast('Name and description are required.'); return; }
+  const data = {
+    name, desc,
+    cat: document.getElementById('f-cat').value,
+    diff: document.getElementById('f-diff').value,
+    dur: parseInt(document.getElementById('f-dur').value) || 2,
+    reps: document.getElementById('f-reps').value.trim(),
+    setup: document.getElementById('f-setup').value.trim(),
+    cue: document.getElementById('f-cue').value.trim(),
+  };
+  if (editingId) {
+    const idx = drills.findIndex(x => x.id === editingId);
+    if (idx > -1) drills[idx] = { ...drills[idx], ...data };
+    showToast('Drill updated!');
+  } else {
+    data.id = 'custom_' + Date.now();
+    drills.push(data);
+    showToast('Drill added to library!');
+  }
+  saveDrills();
+  closeModal();
+  populateCategoryFilter();
+  renderLibrary();
+}
+function deleteDrill(id) {
+  if (!confirm('Delete this drill from the library?')) return;
+  drills = drills.filter(d => d.id !== id);
+  saveDrills();
+  populateCategoryFilter();
+  renderLibrary();
+  showToast('Drill deleted.');
+}
+
+// ─────────────────────────────────────────────
+// PAGES
+// ─────────────────────────────────────────────
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`page-${page}`).classList.add('active');
+  document.querySelector(`[onclick="showPage('${page}')"]`).classList.add('active');
+  if (page === 'library') { populateCategoryFilter(); renderLibrary(); }
+}
+
+// ─────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─────────────────────────────────────────────
+// MIDNIGHT RESET CHECK
+// ─────────────────────────────────────────────
+function scheduleMidnightReset() {
+  const now = new Date();
+  const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+  const ms = midnight - now;
+  setTimeout(() => {
+    generateSession(true);
+    renderSession();
+    showToast('🌅 New day — fresh session generated!');
+    scheduleMidnightReset();
+  }, ms);
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+loadState();
+generateSession();
+renderSession();
+scheduleMidnightReset();
+</script>
+</body>
+</html>
+
+							<script>
+                            	
+							</script>
+                        </body>
+                        </html>
+                    
