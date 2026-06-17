@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Solo Soccer Drill Library</title>
+<style>
+  :root {
+    --green: #1a7a3c;
+    --green-light: #23a455;
+    --green-dark: #0f4d25;
+    --accent: #f0c040;
+    --bg: #f4f7f4;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --muted: #6b7280;
+    --red: #dc2626;
+    --blue: #2563eb;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  nav {
+    background: var(--green-dark); color: #fff;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; height: 56px; position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .nav-logo { font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    background: none; border: none; color: rgba(255,255,255,0.7);
+    padding: 8px 14px; border-radius: 8px; cursor: pointer;
+    font-size: 0.88rem; font-weight: 600; transition: all 0.2s;
+  }
+  .nav-tab:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .nav-tab.active { background: var(--green-light); color: #fff; }
+  .page { display: none; padding: 20px 16px; max-width: 800px; margin: 0 auto; }
+  .page.active { display: block; }
+  .today-header { margin-bottom: 20px; }
+  .today-header h1 { font-size: 1.5rem; color: var(--green-dark); }
+  .today-header p { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+  .session-meta {
+    background: var(--green-dark); color: #fff;
+    border-radius: var(--radius); padding: 14px 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px;
+  }
+  .session-meta .meta-item { text-align: center; }
+  .session-meta .meta-val { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+  .session-meta .meta-lbl { font-size: 0.75rem; opacity: 0.8; margin-top: 2px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 18px; border-radius: 8px; border: none;
+    cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.18s;
+  }
+  .btn-primary { background: var(--green-light); color: #fff; }
+  .btn-primary:hover { background: var(--green); }
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-danger:hover { background: #b91c1c; }
+  .btn-secondary { background: #e5e7eb; color: var(--text); }
+  .btn-secondary:hover { background: #d1d5db; }
+  .btn-accent { background: var(--accent); color: #1a1a1a; }
+  .btn-accent:hover { background: #d4a800; }
+  .regenerate-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .drill-card {
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); margin-bottom: 14px; overflow: hidden;
+  }
+  .drill-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px 10px; cursor: pointer; user-select: none;
+  }
+  .drill-card-left { flex: 1; min-width: 0; }
+  .drill-card-title { font-size: 1rem; font-weight: 700; color: var(--green-dark); }
+  .drill-card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px; }
+  .tag { font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: #e8f5ee; color: var(--green-dark); }
+  .tag.difficulty-intermediate { background: #fef3c7; color: #92400e; }
+  .tag.difficulty-advanced { background: #fee2e2; color: #991b1b; }
+  .tag.difficulty-beginner { background: #dbeafe; color: #1e40af; }
+  .drill-card-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; margin-left: 8px; }
+  .drill-duration { font-size: 0.85rem; font-weight: 700; color: var(--green-light); background: #e8f5ee; padding: 4px 10px; border-radius: 999px; }
+  .vote-btn {
+    background: none; border: 1px solid #e5e7eb; border-radius: 8px;
+    width: 34px; height: 34px; cursor: pointer; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+  }
+  .vote-btn:hover { border-color: var(--green-light); background: #e8f5ee; }
+  .vote-btn.liked { background: #dcfce7; border-color: var(--green-light); }
+  .vote-btn.disliked { background: #fee2e2; border-color: var(--red); }
+  .chevron { font-size: 0.8rem; color: var(--muted); transition: transform 0.2s; margin-left: 4px; }
+  .drill-card.open .chevron { transform: rotate(180deg); }
+  .drill-card-body { display: none; padding: 12px 16px 16px; border-top: 1px solid #f0f0f0; }
+  .drill-card.open .drill-card-body { display: block; }
+  .drill-card-body p { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+  .drill-card-body .setup { font-size: 0.85rem; color: var(--muted); font-style: italic; }
+  .drill-card-body .coaching { font-size: 0.85rem; color: var(--blue); margin-top: 8px; }
+  .timer-bar-wrap { background: #e8f5ee; border-radius: 999px; height: 6px; margin: 10px 0 0; overflow: hidden; }
+  .timer-bar { height: 6px; background: var(--green-light); border-radius: 999px; width: 0%; transition: width 1s linear; }
+  .timer-display { font-size: 0.8rem; color: var(--muted); margin-top: 4px; text-align: right; }
+  .library-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+  .library-header h1 { font-size: 1.4rem; color: var(--green-dark); }
+  .search-row { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .search-input { flex: 1; min-width: 180px; padding: 9px 14px; border-radius: 8px; border: 1.5px solid #e5e7eb; font-size: 0.9rem; outline: none; }
+  .search-input:focus { border-color: var(--green-light); }
+  .filter-select { padding: 9px 12px; border-radius: 8px; border: 1.5px solid #e5e7eb; font-size: 0.88rem; background: #fff; cursor: pointer; outline: none; }
+  .drill-count { font-size: 0.85rem; color: var(--muted); margin-bottom: 12px; }
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 200;
+    align-items: center; justify-content: center; padding: 16px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff; border-radius: var(--radius); width: 100%; max-width: 520px;
+    max-height: 90vh; overflow-y: auto; padding: 24px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+  }
+  .modal h2 { font-size: 1.2rem; color: var(--green-dark); margin-bottom: 18px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; }
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%; padding: 9px 12px; border-radius: 8px;
+    border: 1.5px solid #e5e7eb; font-size: 0.9rem; font-family: inherit; outline: none;
+  }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--green-light); }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-row { display: flex; gap: 10px; }
+  .form-row .form-group { flex: 1; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--green-dark); color: #fff; padding: 10px 22px;
+    border-radius: 8px; font-size: 0.9rem; font-weight: 600;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 300;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+  @media (max-width: 480px) { .nav-tab { padding: 8px 10px; font-size: 0.82rem; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo"><span>⚽</span> Solo Drills</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-page="today">Today</button>
+    <button class="nav-tab" data-page="library">Library</button>
+  </div>
+</nav>
+
+<div id="page-today" class="page active">
+  <div class="today-header">
+    <h1 id="today-date"></h1>
+    <p>Your daily solo training session</p>
+  </div>
+  <div class="session-meta">
+    <div class="meta-item"><div class="meta-val" id="meta-drills">—</div><div class="meta-lbl">Drills</div></div>
+    <div class="meta-item"><div class="meta-val" id="meta-time">—</div><div class="meta-lbl">Minutes</div></div>
+    <div class="meta-item"><div class="meta-val" id="meta-focus">—</div><div class="meta-lbl">Focus</div></div>
+  </div>
+  <div class="regenerate-row">
+    <button class="btn btn-accent" id="btn-regenerate">🔀 New Session</button>
+    <button class="btn btn-primary" id="btn-start">▶ Start</button>
+    <button class="btn btn-secondary" id="btn-skip" style="display:none;">⏭ Skip</button>
+    <button class="btn btn-danger" id="btn-stop" style="display:none;">⏹ Stop</button>
+  </div>
+  <div id="today-drills"></div>
+</div>
+
+<div id="page-library" class="page">
+  <div class="library-header">
+    <h1>Drill Library <span id="lib-count-badge" style="font-size:0.9rem;color:var(--muted);font-weight:400;"></span></h1>
+    <button class="btn btn-primary" id="btn-add-drill">+ Add Drill</button>
+  </div>
+  <div class="search-row">
+    <input class="search-input" id="lib-search" placeholder="Search drills…" />
+    <select class="filter-select" id="lib-filter-cat"><option value="">All Categories</option></select>
+    <select class="filter-select" id="lib-filter-diff">
+      <option value="">All Levels</option>
+      <option value="beginner">Beginner</option>
+      <option value="intermediate">Intermediate</option>
+      <option value="advanced">Advanced</option>
+    </select>
+  </div>
+  <div class="drill-count" id="lib-drill-count"></div>
+  <div id="library-drills"></div>
+</div>
+
+<div class="modal-overlay" id="drill-modal">
+  <div class="modal">
+    <h2 id="modal-title">Add Drill</h2>
+    <div class="form-group"><label>Drill Name *</label><input id="f-name" placeholder="e.g. L-Shaped Cone Weave" /></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Category *</label>
+        <select id="f-cat">
+          <option value="Ball Mastery">Ball Mastery</option>
+          <option value="Cone Dribbling">Cone Dribbling</option>
+          <option value="Agility &amp; Speed">Agility &amp; Speed</option>
+          <option value="Change of Direction">Change of Direction</option>
+          <option value="1v0 Moves">1v0 Moves</option>
+          <option value="First Touch">First Touch</option>
+          <option value="Footwork">Footwork</option>
+          <option value="Acceleration">Acceleration</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Difficulty *</label>
+        <select id="f-diff">
+          <option value="beginner">Beginner</option>
+          <option value="intermediate" selected>Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Duration (min) *</label><input id="f-dur" type="number" min="1" max="10" value="2" /></div>
+      <div class="form-group"><label>Reps / Sets</label><input id="f-reps" placeholder="e.g. 3x30s" /></div>
+    </div>
+    <div class="form-group"><label>Description *</label><textarea id="f-desc" placeholder="Describe how to perform the drill…"></textarea></div>
+    <div class="form-group"><label>Setup (cones, space needed)</label><input id="f-setup" placeholder="e.g. 6 cones in a straight line, 1m apart" /></div>
+    <div class="form-group"><label>Coaching Cue</label><input id="f-cue" placeholder="e.g. Keep head up, use both feet equally" /></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="btn-modal-cancel">Cancel</button>
+      <button class="btn btn-primary" id="btn-modal-save">Save Drill</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Drill database (separate data file). Loaded BEFORE the app script. -->
+<script src="drills.js"></script>
+
+<script>
+var APP = (function () {
+
+  // ── DRILL DATABASE (loaded from drills.js) ──────────────────────────────────
+  // drills.js sets window.SOCCER_DRILLS. If it failed to load we degrade
+  // gracefully instead of crashing.
+  var DEFAULT_DRILLS = (window.SOCCER_DRILLS && window.SOCCER_DRILLS.length)
+    ? window.SOCCER_DRILLS
+    : [];
+  var DATA_OK = DEFAULT_DRILLS.length > 0;
+
+  // ── SAFE STORAGE ────────────────────────────────────────────────────────────
+  // Wraps localStorage so the app works everywhere — including sandboxed
+  // iframes / private windows where localStorage throws. Falls back to an
+  // in-memory store (persists for the page session only) and never throws.
+  var store = (function () {
+    var mem = {};
+    var ok = true;
+    try {
+      var probe = '__ssd_probe__';
+      window.localStorage.setItem(probe, '1');
+      window.localStorage.removeItem(probe);
+    } catch (e) { ok = false; }
+    return {
+      available: function () { return ok; },
+      get: function (key) {
+        if (ok) { try { return window.localStorage.getItem(key); } catch (e) { ok = false; } }
+        return Object.prototype.hasOwnProperty.call(mem, key) ? mem[key] : null;
+      },
+      set: function (key, val) {
+        if (ok) { try { window.localStorage.setItem(key, val); return; } catch (e) { ok = false; } }
+        mem[key] = String(val);
+      },
+      remove: function (key) {
+        if (ok) { try { window.localStorage.removeItem(key); return; } catch (e) { ok = false; } }
+        delete mem[key];
+      }
+    };
+  })();
+
+  // ── STATE ───────────────────────────────────────────────────────────────────
+  var drills = [];
+  var session = [];
+  var votes = {};
+  var editingId = null;
+
+  // session runner state machine (pause-able)
+  var runner = { active: false, paused: false, index: -1, remaining: 0, intervalId: null };
+
+  function loadState() {
+    var d = store.get('ssd_drills');
+    try { drills = d ? JSON.parse(d) : []; } catch (e) { drills = []; }
+    if (!drills || !drills.length) {
+      drills = JSON.parse(JSON.stringify(DEFAULT_DRILLS));
+      saveDrills();
+    }
+    var v = store.get('ssd_votes');
+    try { votes = v ? JSON.parse(v) : {}; } catch (e) { votes = {}; }
+  }
+
+  function saveDrills() { store.set('ssd_drills', JSON.stringify(drills)); }
+  function saveVotes()  { store.set('ssd_votes',  JSON.stringify(votes));  }
+
+  // ── SESSION GENERATION ──────────────────────────────────────────────────────
+  function getTodayKey() {
+    var d = new Date();
+    return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+  }
+
+  function getWeight(drill) {
+    var v = votes[drill.id] || 0;
+    if (v >= 3)   return 0.2;
+    if (v === 2)  return 0.5;
+    if (v === 1)  return 0.75;
+    if (v === -1) return 1.4;
+    if (v === -2) return 1.8;
+    if (v <= -3)  return 2.5;
+    return 1.0;
+  }
+
+  function weightedShuffle(arr) {
+    var scored = arr.map(function (d) {
+      return { drill: d, score: Math.random() * getWeight(d) };
+    });
+    scored.sort(function (a, b) { return b.score - a.score; });
+    return scored.map(function (x) { return x.drill; });
+  }
+
+  function generateSession(forceNew) {
+    var key = getTodayKey();
+    if (!forceNew) {
+      var storedKey = store.get('ssd_session_date');
+      var storedData = store.get('ssd_session');
+      if (storedKey === key && storedData) {
+        try {
+          var parsed = JSON.parse(storedData);
+          if (parsed && parsed.length) {
+            // make sure every stored drill still exists; otherwise regenerate
+            var byId = {};
+            for (var x = 0; x < drills.length; x++) byId[drills[x].id] = true;
+            var stillValid = true;
+            for (var y = 0; y < parsed.length; y++) {
+              if (!byId[parsed[y].id]) { stillValid = false; break; }
+            }
+            if (stillValid) { session = parsed; return; }
+          }
+        } catch (e) { /* fall through to regenerate */ }
+      }
+    }
+    var pool = weightedShuffle(drills.slice());
+    session = [];
+    var total = 0;
+    for (var i = 0; i < pool.length; i++) {
+      var d = pool[i];
+      if (total + d.dur <= 20) { session.push(d); total += d.dur; }
+      if (total >= 15) break;
+    }
+    store.set('ssd_session_date', key);
+    store.set('ssd_session', JSON.stringify(session));
+  }
+
+  // ── RENDER SESSION ──────────────────────────────────────────────────────────
+  function renderSession() {
+    var container = document.getElementById('today-drills');
+    if (!container) return;
+
+    if (!DATA_OK) {
+      container.innerHTML = dataErrorHtml();
+      document.getElementById('meta-drills').textContent = '0';
+      document.getElementById('meta-time').textContent = '0';
+      document.getElementById('meta-focus').textContent = '—';
+      return;
+    }
+
+    var totalMins = 0;
+    for (var i = 0; i < session.length; i++) totalMins += session[i].dur;
+
+    document.getElementById('meta-drills').textContent = session.length;
+    document.getElementById('meta-time').textContent = totalMins;
+
+    var cats = [];
+    for (var j = 0; j < session.length; j++) {
+      if (cats.indexOf(session[j].cat) === -1) cats.push(session[j].cat);
+    }
+    document.getElementById('meta-focus').textContent =
+      cats.length === 0 ? '—' : (cats.length <= 2 ? cats.join(' + ') : cats.length + ' Areas');
+
+    var today = new Date();
+    document.getElementById('today-date').textContent =
+      today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+    if (!session.length) {
+      container.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>No drills in session. Try a new session, or add drills in the Library.</p></div>';
+      return;
+    }
+
+    var html = '';
+    for (var k = 0; k < session.length; k++) html += buildCard(session[k], k);
+    container.innerHTML = html;
+
+    for (var m = 0; m < session.length; m++) bindCardEvents(session[m], m, 'session');
+  }
+
+  function dataErrorHtml() {
+    return '<div class="empty-state"><div class="icon">⚠️</div>' +
+           '<p><strong>Drill data did not load.</strong><br>' +
+           'Make sure <code>drills.js</code> is in the same folder as <code>index.html</code> ' +
+           'and loads before the app script.</p></div>';
+  }
+
+  // ── RENDER LIBRARY ──────────────────────────────────────────────────────────
+  function renderLibrary() {
+    var container = document.getElementById('library-drills');
+    if (!DATA_OK) { container.innerHTML = dataErrorHtml(); return; }
+
+    var search = document.getElementById('lib-search').value.toLowerCase();
+    var cat = document.getElementById('lib-filter-cat').value;
+    var diff = document.getElementById('lib-filter-diff').value;
+
+    var filtered = [];
+    for (var i = 0; i < drills.length; i++) {
+      var d = drills[i];
+      var ms = !search || d.name.toLowerCase().indexOf(search) > -1
+                       || d.desc.toLowerCase().indexOf(search) > -1
+                       || d.cat.toLowerCase().indexOf(search) > -1;
+      var mc = !cat || d.cat === cat;
+      var md = !diff || d.diff === diff;
+      if (ms && mc && md) filtered.push(d);
+    }
+
+    document.getElementById('lib-drill-count').textContent =
+      'Showing ' + filtered.length + ' of ' + drills.length + ' drills';
+    document.getElementById('lib-count-badge').textContent = '(' + drills.length + ')';
+
+    if (!filtered.length) {
+      container.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><p>No drills match your search.</p></div>';
+      return;
+    }
+
+    var html = '';
+    for (var j = 0; j < filtered.length; j++) html += buildLibCard(filtered[j], j);
+    container.innerHTML = html;
+
+    for (var k = 0; k < filtered.length; k++) {
+      bindCardEvents(filtered[k], k, 'lib');
+      (function (drill, idx) {
+        var editBtn = document.getElementById('edit-' + idx);
+        var delBtn  = document.getElementById('del-' + idx);
+        if (editBtn) editBtn.addEventListener('click', function (e) { e.stopPropagation(); openEditModal(drill.id); });
+        if (delBtn)  delBtn.addEventListener('click', function (e) { e.stopPropagation(); deleteDrill(drill.id); });
+      })(filtered[k], k);
+    }
+  }
+
+  function populateCategoryFilter() {
+    var cats = [];
+    for (var i = 0; i < drills.length; i++) {
+      if (cats.indexOf(drills[i].cat) === -1) cats.push(drills[i].cat);
+    }
+    cats.sort();
+    var sel = document.getElementById('lib-filter-cat');
+    var current = sel.value;
+    var html = '<option value="">All Categories</option>';
+    for (var j = 0; j < cats.length; j++) {
+      html += '<option value="' + cats[j] + '">' + cats[j] + '</option>';
+    }
+    sel.innerHTML = html;
+    sel.value = current; // preserve selection across re-population
+  }
+
+  // ── BUILD CARD HTML ─────────────────────────────────────────────────────────
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function cardInner(d, ctx, i, extraButtons, withTimer) {
+    var v = votes[d.id] || 0;
+    var did = esc(d.id);
+    return [
+      '<div class="drill-card" id="card-' + ctx + '-' + i + '">',
+        '<div class="drill-card-header" id="hdr-' + ctx + '-' + i + '">',
+          '<div class="drill-card-left">',
+            '<div class="drill-card-title">' + esc(d.name) + '</div>',
+            '<div class="drill-card-tags">',
+              '<span class="tag">' + esc(d.cat) + '</span>',
+              '<span class="tag difficulty-' + esc(d.diff) + '">' + cap(esc(d.diff)) + '</span>',
+              (d.reps ? '<span class="tag">' + esc(d.reps) + '</span>' : ''),
+            '</div>',
+          '</div>',
+          '<div class="drill-card-right">',
+            '<span class="drill-duration">' + d.dur + ' min</span>',
+            '<button class="vote-btn' + (v > 0 ? ' liked' : '') + '" data-did="' + did + '" data-vote="up" id="vup-' + ctx + '-' + i + '" title="See this more">&#128077;</button>',
+            '<button class="vote-btn' + (v < 0 ? ' disliked' : '') + '" data-did="' + did + '" data-vote="down" id="vdn-' + ctx + '-' + i + '" title="See this less">&#128078;</button>',
+            extraButtons,
+            '<span class="chevron">&#9660;</span>',
+          '</div>',
+        '</div>',
+        '<div class="drill-card-body">',
+          '<p>' + esc(d.desc) + '</p>',
+          (d.setup ? '<p class="setup">Setup: ' + esc(d.setup) + '</p>' : ''),
+          (d.cue   ? '<p class="coaching">Tip: ' + esc(d.cue) + '</p>' : ''),
+          (withTimer
+            ? '<div class="timer-bar-wrap"><div class="timer-bar" id="tbar-' + i + '"></div></div>' +
+              '<div class="timer-display" id="tdisplay-' + i + '">' + (d.dur * 60) + 's</div>'
+            : ''),
+        '</div>',
+      '</div>'
+    ].join('');
+  }
+
+  function buildCard(d, i) { return cardInner(d, 'session', i, '', true); }
+
+  function buildLibCard(d, i) {
+    var extra =
+      '<button class="btn btn-secondary" style="padding:4px 10px;font-size:0.8rem;" id="edit-' + i + '">Edit</button>' +
+      '<button class="btn btn-danger"    style="padding:4px 10px;font-size:0.8rem;" id="del-'  + i + '">Del</button>';
+    return cardInner(d, 'lib', i, extra, false);
+  }
+
+  // ── BIND CARD EVENTS ────────────────────────────────────────────────────────
+  function bindCardEvents(drill, idx, ctx) {
+    var hdr = document.getElementById('hdr-' + ctx + '-' + idx);
+    var vup = document.getElementById('vup-' + ctx + '-' + idx);
+    var vdn = document.getElementById('vdn-' + ctx + '-' + idx);
+
+    if (hdr) {
+      hdr.addEventListener('click', function (e) {
+        if (e.target.tagName === 'BUTTON') return;
+        var card = document.getElementById('card-' + ctx + '-' + idx);
+        if (card) card.classList.toggle('open');
+      });
+    }
+    if (vup) vup.addEventListener('click', function (e) { e.stopPropagation(); doVote(drill.id, 1); });
+    if (vdn) vdn.addEventListener('click', function (e) { e.stopPropagation(); doVote(drill.id, -1); });
+  }
+
+  // ── VOTE ────────────────────────────────────────────────────────────────────
+  function doVote(id, dir) {
+    votes[id] = Math.max(-5, Math.min(5, (votes[id] || 0) + dir));
+    saveVotes();
+    var v = votes[id];
+    // Update every vote button for this drill, on whichever page(s) are rendered,
+    // so Today and Library stay in sync.
+    var ups = document.querySelectorAll('[data-did="' + cssEscape(id) + '"][data-vote="up"]');
+    var dns = document.querySelectorAll('[data-did="' + cssEscape(id) + '"][data-vote="down"]');
+    var a;
+    for (a = 0; a < ups.length; a++) ups[a].className = 'vote-btn' + (v > 0 ? ' liked' : '');
+    for (a = 0; a < dns.length; a++) dns[a].className = 'vote-btn' + (v < 0 ? ' disliked' : '');
+    showToast(dir > 0 ? '👍 You will see this more often' : '👎 You will see this less often');
+  }
+
+  // minimal attribute-value escaper for querySelector (ids here are simple, but be safe)
+  function cssEscape(s) { return String(s).replace(/["\\\]]/g, '\\$&'); }
+
+  // ── SESSION RUNNER (pause-able state machine) ───────────────────────────────
+  function setRunnerButtons() {
+    var startBtn = document.getElementById('btn-start');
+    var skipBtn  = document.getElementById('btn-skip');
+    var stopBtn  = document.getElementById('btn-stop');
+    if (!startBtn) return;
+    if (!runner.active) {
+      startBtn.textContent = '▶ Start';
+      if (skipBtn) skipBtn.style.display = 'none';
+      if (stopBtn) stopBtn.style.display = 'none';
+    } else {
+      startBtn.textContent = runner.paused ? '▶ Resume' : '⏸ Pause';
+      if (skipBtn) skipBtn.style.display = '';
+      if (stopBtn) stopBtn.style.display = '';
+    }
+  }
+
+  function fmtTime(secs) {
+    var m = Math.floor(secs / 60), s = secs % 60;
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function paintActive() {
+    var i = runner.index;
+    var drill = session[i];
+    if (!drill) return;
+    var total = drill.dur * 60;
+    var bar = document.getElementById('tbar-' + i);
+    var disp = document.getElementById('tdisplay-' + i);
+    var pct = ((total - runner.remaining) / total) * 100;
+    if (bar) bar.style.width = pct + '%';
+    if (disp) disp.textContent = runner.paused
+      ? 'Paused · ' + fmtTime(runner.remaining) + ' left'
+      : fmtTime(runner.remaining) + ' left';
+  }
+
+  function openActiveCard() {
+    for (var i = 0; i < session.length; i++) {
+      var c = document.getElementById('card-session-' + i);
+      if (c) {
+        if (i === runner.index) c.classList.add('open');
+        else c.classList.remove('open');
+      }
+    }
+    var active = document.getElementById('card-session-' + runner.index);
+    if (active && active.scrollIntoView) active.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function enterDrill(i) {
+    runner.index = i;
+    runner.remaining = session[i].dur * 60;
+    openActiveCard();
+    paintActive();
+  }
+
+  function finishDrill() {
+    var i = runner.index;
+    var bar = document.getElementById('tbar-' + i);
+    var disp = document.getElementById('tdisplay-' + i);
+    if (bar) bar.style.width = '100%';
+    if (disp) disp.textContent = '✓ Done';
+  }
+
+  function tick() {
+    if (!runner.active || runner.paused) return;
+    if (runner.remaining > 0) {
+      runner.remaining--;
+      paintActive();
+      if (runner.remaining === 0) finishDrill();
+    } else {
+      if (runner.index + 1 < session.length) {
+        enterDrill(runner.index + 1);
+      } else {
+        stopSession(true);
+        showToast('🏁 Session complete — nice work!');
+      }
+    }
+  }
+
+  function startSession() {
+    if (!session.length) { showToast('No drills to run. Generate a session first.'); return; }
+    runner.active = true;
+    runner.paused = false;
+    if (runner.intervalId) clearInterval(runner.intervalId);
+    runner.intervalId = setInterval(tick, 1000);
+    enterDrill(0);
+    setRunnerButtons();
+    showToast('▶ Session started — first drill is up');
+  }
+
+  function pauseSession()  { runner.paused = true;  paintActive(); setRunnerButtons(); }
+  function resumeSession() { runner.paused = false; paintActive(); setRunnerButtons(); }
+
+  function skipDrill() {
+    if (!runner.active) return;
+    finishDrill();
+    if (runner.index + 1 < session.length) {
+      enterDrill(runner.index + 1);
+      if (runner.paused) paintActive();
+    } else {
+      stopSession(true);
+      showToast('🏁 Session complete — nice work!');
+    }
+  }
+
+  function stopSession(keepProgress) {
+    runner.active = false;
+    runner.paused = false;
+    if (runner.intervalId) { clearInterval(runner.intervalId); runner.intervalId = null; }
+    if (!keepProgress) {
+      for (var i = 0; i < session.length; i++) {
+        var bar = document.getElementById('tbar-' + i);
+        var disp = document.getElementById('tdisplay-' + i);
+        if (bar) bar.style.width = '0%';
+        if (disp) disp.textContent = (session[i].dur * 60) + 's';
+      }
+    }
+    runner.index = -1;
+    setRunnerButtons();
+  }
+
+  function onStartButton() {
+    if (!runner.active) startSession();
+    else if (runner.paused) resumeSession();
+    else pauseSession();
+  }
+
+  // ── MODAL ───────────────────────────────────────────────────────────────────
+  function openAddModal() {
+    editingId = null;
+    document.getElementById('modal-title').textContent = 'Add Drill';
+    document.getElementById('f-name').value  = '';
+    document.getElementById('f-cat').value   = 'Ball Mastery';
+    document.getElementById('f-diff').value  = 'intermediate';
+    document.getElementById('f-dur').value   = '2';
+    document.getElementById('f-reps').value  = '';
+    document.getElementById('f-desc').value  = '';
+    document.getElementById('f-setup').value = '';
+    document.getElementById('f-cue').value   = '';
+    document.getElementById('drill-modal').classList.add('open');
+  }
+
+  function openEditModal(id) {
+    var d = null;
+    for (var i = 0; i < drills.length; i++) {
+      if (drills[i].id === id) { d = drills[i]; break; }
+    }
+    if (!d) return;
+    editingId = id;
+    document.getElementById('modal-title').textContent = 'Edit Drill';
+    document.getElementById('f-name').value  = d.name;
+    document.getElementById('f-cat').value   = d.cat;
+    document.getElementById('f-diff').value  = d.diff;
+    document.getElementById('f-dur').value   = d.dur;
+    document.getElementById('f-reps').value  = d.reps  || '';
+    document.getElementById('f-desc').value  = d.desc;
+    document.getElementById('f-setup').value = d.setup || '';
+    document.getElementById('f-cue').value   = d.cue   || '';
+    document.getElementById('drill-modal').classList.add('open');
+  }
+
+  function closeModal() { document.getElementById('drill-modal').classList.remove('open'); }
+
+  function saveDrill() {
+    var name = document.getElementById('f-name').value.trim();
+    var desc = document.getElementById('f-desc').value.trim();
+    if (!name || !desc) { showToast('Name and description are required.'); return; }
+    var data = {
+      name:  name,
+      desc:  desc,
+      cat:   document.getElementById('f-cat').value,
+      diff:  document.getElementById('f-diff').value,
+      dur:   Math.max(1, Math.min(20, parseInt(document.getElementById('f-dur').value, 10) || 2)),
+      reps:  document.getElementById('f-reps').value.trim(),
+      setup: document.getElementById('f-setup').value.trim(),
+      cue:   document.getElementById('f-cue').value.trim()
+    };
+    if (editingId) {
+      for (var i = 0; i < drills.length; i++) {
+        if (drills[i].id === editingId) {
+          drills[i].name  = data.name;
+          drills[i].desc  = data.desc;
+          drills[i].cat   = data.cat;
+          drills[i].diff  = data.diff;
+          drills[i].dur   = data.dur;
+          drills[i].reps  = data.reps;
+          drills[i].setup = data.setup;
+          drills[i].cue   = data.cue;
+          break;
+        }
+      }
+      showToast('Drill updated!');
+    } else {
+      data.id = 'custom_' + Date.now();
+      drills.push(data);
+      showToast('Drill added!');
+    }
+    saveDrills();
+    closeModal();
+    populateCategoryFilter();
+    renderLibrary();
+  }
+
+  function deleteDrill(id) {
+    if (!window.confirm('Delete this drill?')) return;
+    var newDrills = [];
+    for (var i = 0; i < drills.length; i++) {
+      if (drills[i].id !== id) newDrills.push(drills[i]);
+    }
+    drills = newDrills;
+    saveDrills();
+    populateCategoryFilter();
+    renderLibrary();
+    showToast('Drill deleted.');
+  }
+
+  // ── PAGES ───────────────────────────────────────────────────────────────────
+  function showPage(page) {
+    var pages = document.querySelectorAll('.page');
+    for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
+    var tabs = document.querySelectorAll('.nav-tab');
+    for (var j = 0; j < tabs.length; j++) tabs[j].classList.remove('active');
+    document.getElementById('page-' + page).classList.add('active');
+    var tab = document.querySelector('[data-page="' + page + '"]');
+    if (tab) tab.classList.add('active');
+    if (page === 'library') { populateCategoryFilter(); renderLibrary(); }
+  }
+
+  // ── TOAST ───────────────────────────────────────────────────────────────────
+  var toastTimer = null;
+  function showToast(msg) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2500);
+  }
+
+  // ── STORAGE NOTICE ──────────────────────────────────────────────────────────
+  function showStorageNoticeIfNeeded() {
+    if (store.available()) return;
+    var header = document.querySelector('.today-header');
+    if (!header) return;
+    var note = document.createElement('p');
+    note.style.cssText = 'margin-top:8px;font-size:0.8rem;color:#92400e;background:#fef3c7;padding:8px 12px;border-radius:8px;';
+    note.textContent = '⚠ This preview can not save data, so votes and your daily session reset on reload. Once hosted on GitHub Pages, everything saves automatically.';
+    header.appendChild(note);
+  }
+
+  // ── MIDNIGHT RESET ──────────────────────────────────────────────────────────
+  function scheduleMidnight() {
+    var now = new Date();
+    var midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+    var ms = midnight.getTime() - now.getTime();
+    setTimeout(function () {
+      stopSession(false);
+      generateSession(true);
+      renderSession();
+      showToast('New day — fresh session ready!');
+      scheduleMidnight();
+    }, ms);
+  }
+
+  // ── INIT ─────────────────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', function () {
+
+    loadState();
+    generateSession(false);
+    renderSession();
+    showStorageNoticeIfNeeded();
+    scheduleMidnight();
+
+    // nav tabs
+    var tabs = document.querySelectorAll('.nav-tab');
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].addEventListener('click', function () { showPage(this.dataset.page); });
+    }
+
+    // today page buttons
+    document.getElementById('btn-regenerate').addEventListener('click', function () {
+      stopSession(false);
+      generateSession(true);
+      renderSession();
+      showToast('New session generated!');
+    });
+    document.getElementById('btn-start').addEventListener('click', onStartButton);
+    var skipBtn = document.getElementById('btn-skip');
+    var stopBtn = document.getElementById('btn-stop');
+    if (skipBtn) skipBtn.addEventListener('click', skipDrill);
+    if (stopBtn) stopBtn.addEventListener('click', function () { stopSession(false); showToast('Session stopped.'); });
+
+    // library buttons
+    document.getElementById('btn-add-drill').addEventListener('click', openAddModal);
+    document.getElementById('lib-search').addEventListener('input', renderLibrary);
+    document.getElementById('lib-filter-cat').addEventListener('change', renderLibrary);
+    document.getElementById('lib-filter-diff').addEventListener('change', renderLibrary);
+
+    // modal buttons
+    document.getElementById('btn-modal-cancel').addEventListener('click', closeModal);
+    document.getElementById('btn-modal-save').addEventListener('click', saveDrill);
+    document.getElementById('drill-modal').addEventListener('click', function (e) {
+      if (e.target === this) closeModal();
+    });
+  });
+
+  // expose nothing — fully encapsulated
+})();
+
+</script>
+</body>
+</html>
